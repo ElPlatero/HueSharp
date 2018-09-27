@@ -5,6 +5,7 @@ using HueSharp.Messages;
 using HueSharp.Messages.Groups;
 using HueSharp.Messages.Lights;
 using HueSharp.Messages.Scenes;
+using HueSharp.Messages.Schedules;
 using HueSharp.Net;
 using Xunit.Abstractions;
 
@@ -46,6 +47,9 @@ namespace HueSharp.Tests
                 case GetAllScenesResponse getAllScenesResponse:
                     OnLog(ToString(getAllScenesResponse));
                     break;
+                case GetAllSchedulesResponse getAllSchedulesResponse:
+                    OnLog(ToString(getAllSchedulesResponse));
+                    break;
                 case SuccessResponse successResponse:
                     OnLog(ToString(successResponse));
                     break;
@@ -82,6 +86,16 @@ namespace HueSharp.Tests
         }
 
         private static string ToString(GetAllScenesResponse p)
+        {
+            return string.Join(Environment.NewLine, p.Select(ToString));
+        }
+
+        private static string ToString(GetScheduleResponse p)
+        {
+            return $@"{p.Id} - ""{p.Name}"" ({p.Description}): {p.Timing.ToJson()}";
+        }
+
+        private static string ToString(GetAllSchedulesResponse p)
         {
             return string.Join(Environment.NewLine, p.Select(ToString));
         }
