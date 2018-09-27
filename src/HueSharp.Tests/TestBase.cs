@@ -2,6 +2,7 @@
 using System.Linq;
 using HueSharp.Messages;
 using HueSharp.Messages.Groups;
+using HueSharp.Messages.Lights;
 using HueSharp.Net;
 using Xunit.Abstractions;
 
@@ -34,6 +35,12 @@ namespace HueSharp.Tests
                 case GetAllGroupsResponse getAllGroupsResponse:
                     OnLog(ToString(getAllGroupsResponse));
                     break;
+                case GetLightStateResponse getLightStateResponse:
+                    OnLog(ToString(getLightStateResponse));
+                    break;
+                case GetAllLightsResponse getAllLightsResponse:
+                    OnLog(ToString(getAllLightsResponse));
+                    break;
                 case SuccessResponse successResponse:
                     OnLog(ToString(successResponse));
                     break;
@@ -49,10 +56,23 @@ namespace HueSharp.Tests
             return string.Join(Environment.NewLine, p.Select(ToString));
         }
 
+        private static string ToString(GetAllLightsResponse p)
+        {
+            return string.Join(Environment.NewLine, p.Select(ToString));
+        }
+
         private static string ToString(GetGroupResponse p)
         {
             return $@"{p.Id} - ""{p.Name}"" ({string.Join(",", p.LightIds)}): {(p.State.AllOn ? "all on" : p.State.AnyOn ? "some on" : "all off")}";
         }
+
+        private static string ToString(Light p)
+        {
+            return $@"{p.Type} ""{p.Name}"": {(p.Status.IsOn ? "on":"off")}, {(p.Status.IsReachable ? "available" : "not available")}";
+        }
+
+        private static string ToString(GetLightStateResponse p)
+            => $"{p.Name}: {(p.Status.IsOn ? "on" : "off")}";
 
         private static string ToString(SuccessResponse p)
             => string.Join(", ", p.Select(q => $"{q.Key}: {q.Value}"));

@@ -12,19 +12,18 @@ namespace HueSharp.Tests
             : base(outputHelper) { }
 
 
-        [RunnableInDebugOnly]
+        [ExplicitFact]
         public void GetAllGroupsTest()
         {
             var request = new GetAllGroupsRequest();
-            IHueResponse response = null;
 
-            response = _client.GetResponse(request);
+            var response = _client.GetResponse(request);
             Assert.True(response is GetAllGroupsResponse);
 
             OnLog(response);
         }
 
-        [RunnableInDebugOnly]
+        [ExplicitFact]
         public void GetGroupTest()
         {
             var request = new GetGroupRequest(3);
@@ -35,7 +34,7 @@ namespace HueSharp.Tests
             OnLog(response);
         }
 
-        [RunnableInDebugOnly]
+        [ExplicitFact]
         public void SetGroupTest()
         {
             IHueRequest request = new GetGroupRequest(1);
@@ -52,7 +51,7 @@ namespace HueSharp.Tests
             OnLog(response);
         }
 
-        [RunnableInDebugOnly]
+        [ExplicitFact]
         public void SetGroupStateTest()
         {
             IHueRequest request = new SetGroupStateRequest(3, new SetGroupState { IsOn = false });
@@ -63,7 +62,7 @@ namespace HueSharp.Tests
             OnLog(response);
         }
 
-        [RunnableInDebugOnly]
+        [ExplicitFact]
         public void CreateAndDeleteGroupTest()
         {
             IHueRequest request = new CreateGroupRequest("tmp testgroup", 6, 7);

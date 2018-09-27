@@ -1,64 +1,68 @@
-﻿using HueSharp.Enums;
-using HueSharp.Messages;
+﻿using HueSharp.Messages;
 using HueSharp.Messages.Lights;
-using HueSharp.Net;
 using System;
 using System.Linq;
+using HueSharp.Enums;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace HueSharp.Tests
 {
-    internal class HueClientLightTests
+    public class HueClientLightTests : TestBase
     {
-        private const string DEV_USER = "hRls7hTDQwox8oCu0GT-rDlY2rdzo7BWgDfmBzh4";
-        private const string DEV_ADDRESS = @"http://192.168.100.14";
+        public HueClientLightTests(ITestOutputHelper outputHelper) 
+            : base(outputHelper) { }
 
-        private HueClient _client;
 
-        public void Setup()
-        {
-            _client = new HueClient(DEV_USER, DEV_ADDRESS);
-            _client.Log += (s, e) => Console.WriteLine(e);
-        }
-
+        [ExplicitFact]
         public void GetLightStateTest()
         {
-            var request = new GetLightStateRequest();
-            request.LightId = 7;
+            var request = new GetLightStateRequest {LightId = 7};
 
-            IHueResponse response = null;
+            var response = _client.GetResponse(request);
 
-            response = _client.GetResponse(request);
             Assert.True(response != null);
             Assert.True(response.GetType() != typeof(ErrorResponse));
+
+            OnLog(response);
         }
 
+        [ExplicitFact]
         public void SetLightStateTest()
         {
             IHueRequest request = new GetLightStateRequest(7);
-            GetLightStateResponse response = _client.GetResponse(request) as GetLightStateResponse;
+            var response = _client.GetResponse(request) as GetLightStateResponse;
+            Assert.NotNull(response);
 
             request = new SetLightStateRequest(7);
-
-            if (!response.Status.IsOn) ((SetLightStateRequest)request).Status.IsOn = true;
-            ((SetLightStateRequest)request).Status.Hue = new Random().Next(0, ushort.MaxValue);
+            ((SetLightStateRequest) request).Status.IsOn = !response.Status.IsOn;
+            if (!response.Status.IsOn)
+            {
+                ((SetLightStateRequest)request).Status.Hue = new Random().Next(0, ushort.MaxValue);
+                ((SetLightStateRequest) request).Status.Effect = LightEffect.ColorLoop;
+            }
 
             _client.GetResponse(request);
+
             Assert.True(!((SetLightStateRequest)request).Status.HasUnsavedChanges);
          }
 
+        [ExplicitFact]
         public void GetAllLightsTest()
         {
-            var request = new GetAllLightsRequest();
+            IHueRequest request = new GetAllLightsRequest();
+
             var response = _client.GetResponse(request);
-            ((GetAllLightsResponse)response).ForEach(p => Console.WriteLine("{0} - {1} ({2})", p.Id, p.Name, p.Status.IsOn ? "an" : "aus"));
+            Assert.True(response is GetAllLightsResponse);
+
+            OnLog(response);
         }
 
+        [ExplicitFact]
         public void CreateErrorObjectTest()
         {
-            var initialRequest = new GetAllLightsRequest();
+            IHueRequest initialRequest = new GetAllLightsRequest();
             var initialResponse = (GetAllLightsResponse)_client.GetResponse(initialRequest);
-
             var id = initialResponse.First(p => !p.Status.IsOn).Id;
 
             var request = new SetLightStateRequest(id);
@@ -68,21 +72,22 @@ namespace HueSharp.Tests
             Assert.Throws<HueResponseException>(() => result = _client.GetResponse(request));
         }
 
+        [ExplicitFact]
         public void GetNewLightsTest()
         {
-            var request = new GetNewLightsRequest();
+            IHueRequest request = new GetNewLightsRequest();
 
-            IHueResponse response = null;
-            response = _client.GetResponse(request);
-            Assert.False(response is ErrorResponse);
+            var response = _client.GetResponse(request);
+            Assert.True(response is GetNewLightsResponse);
+            Assert.Empty((GetNewLightsResponse)response);
         }
 
+        [ExplicitFact]
         public void SearchNewLightsTest()
         {
             IHueRequest request = new SearchNewLightsRequest();
 
-            IHueResponse response = null;
-            response = _client.GetResponse(request);
+            var response = _client.GetResponse(request);
             Assert.True(response is SuccessResponse);
 
             request = new GetNewLightsRequest();
@@ -91,23 +96,27 @@ namespace HueSharp.Tests
             Assert.True(((GetNewLightsResponse)response).LastScan == DateTime.MaxValue);
         }
 
+        [ExplicitFact]
         public void SetLightAttributesTest()
         {
-            var request = new SetLightAttributesRequest(7, "Testname");
+            IHueRequest request = new SetLightAttributesRequest(7, "Testname");
 
-            IHueResponse response = null;
+            var response = _client.GetResponse(request);
 
-            response = _client.GetResponse(request);
             Assert.True(response != null);
             Assert.True(response is SuccessResponse);
+            OnLog(response);
         }
 
+        [ExplicitFact]
         public void DeleteLightTest()
         {
             var request = new DeleteLightRequest(7);
-            IHueResponse response = null;
 
+            IHueResponse response = null;
             Assert.Throws<ArgumentException>(() => response = _client.GetResponse(request));
+            Assert.Null(response);
         }
+
     }
 }
