@@ -48,11 +48,10 @@ namespace HueSharp.Tests
             var request = new DeleteSensorRequest(sensorId);
             IHueResponse response = null;
 
-            Assert.DoesNotThrow(() => response = _client.GetResponse(request));
-            Assert.That(response is SuccessResponse);
+            response = _client.GetResponse(request);
+            Assert.True(response is SuccessResponse);
         }
 
-        [TestFixtureSetUp]
         public void Setup()
         {
             _client = new HueClient(DEV_USER, DEV_ADDRESS);
@@ -61,7 +60,6 @@ namespace HueSharp.Tests
 
         }
 
-        [TestFixtureTearDown]
         public void TearDown()
         {
             _client.Log -= ClientOnLog;
@@ -74,11 +72,10 @@ namespace HueSharp.Tests
             var request = new GetAllSensorsRequest();
             IHueResponse response = null;
 
-            Assert.DoesNotThrow(() => response = _client.GetResponse(request), "send request");
-            Assert.That(response is GetAllSensorsResponse);
+            response = _client.GetResponse(request);
+            Assert.True(response is GetAllSensorsResponse);
         }
 
-        [Test]
         public void CreateSensorTest()
         {
             var request = new CreateSensorRequest
@@ -100,58 +97,53 @@ namespace HueSharp.Tests
 
             IHueResponse response = null;
 
-            Assert.DoesNotThrow(() => response = _client.GetResponse(request), "create tmp sensor");
-            Assert.That(response is SuccessResponse);
-            Assert.That(request.Sensor.Id > 0);
+            response = _client.GetResponse(request);
+            Assert.True(response is SuccessResponse);
+            Assert.True(request.Sensor.Id > 0);
 
             DeleteTmpSensor(request.Sensor.Id);
         }
 
-        [Test]
         public void FindNewSensorsTest()
         {
             var request = new FindNewSensorsRequest();
             IHueResponse response = null;
 
-            Assert.DoesNotThrow(() => response = _client.GetResponse(request));
-            Assert.That(response is SuccessResponse);
+            response = _client.GetResponse(request);
+            Assert.True(response is SuccessResponse);
         }
 
-        [Test]
         public void GetNewSensorsTest()
         {
             var request = new GetNewSensorsRequest();
 
             IHueResponse response = null;
-            Assert.DoesNotThrow(() => response = _client.GetResponse(request));
-            Assert.That(response is GetNewSensorsResponse);
+            response = _client.GetResponse(request);
+            Assert.True(response is GetNewSensorsResponse);
         }
 
-        [Test]
         public void GetSensorTest()
         {
             var request = new GetSensorRequest(1);
 
             IHueResponse response = null;
 
-            Assert.DoesNotThrow(() => response = _client.GetResponse(request));
-            Assert.That(response is GetSensorResponse);
-            Assert.That(((GetSensorResponse)response).Sensor is DaylightSensor);
-            Assert.AreEqual(((GetSensorResponse)response).Sensor.ModelId, "PHDL00");
+            response = _client.GetResponse(request);
+            Assert.True(response is GetSensorResponse);
+            Assert.True(((GetSensorResponse)response).Sensor is DaylightSensor);
+            Assert.Equal(@"PHDL00", ((GetSensorResponse)response).Sensor.ModelId);
         }
 
-        [Test]
         public void UpdateSensorTest()
         {
             var request = new UpdateSensorRequest(2, "Schalter Schlafzimmer");
 
             IHueResponse response = null;
 
-            Assert.DoesNotThrow(() => response = _client.GetResponse(request));
-            Assert.That(response is SuccessResponse);
+            response = _client.GetResponse(request);
+            Assert.True(response is SuccessResponse);
         }
 
-        [Test]
         public void ChangeSensorConfigTest()
         {
             var sensor = ((GetSensorResponse)_client.GetResponse(new GetSensorRequest(_tmpSensorId))).Sensor;
@@ -160,11 +152,10 @@ namespace HueSharp.Tests
             var request = new ChangeSensorConfigRequest(sensor);
             IHueResponse response = null;
 
-            Assert.DoesNotThrow(() => response = _client.GetResponse(request));
-            Assert.That(response is SuccessResponse);
+            response = _client.GetResponse(request);
+            Assert.True(response is SuccessResponse);
         }
 
-        [Test]
         public void ChangeSensorStateTest()
         {
             var sensor = ((GetSensorResponse)_client.GetResponse(new GetSensorRequest(_tmpSensorId))).Sensor;
@@ -173,8 +164,8 @@ namespace HueSharp.Tests
             var request = new ChangeSensorStateRequest(sensor);
             IHueResponse response = null;
 
-            Assert.DoesNotThrow(() => response = _client.GetResponse(request));
-            Assert.That(response is SuccessResponse);
+            response = _client.GetResponse(request);
+            Assert.True(response is SuccessResponse);
         }
     }
 }
