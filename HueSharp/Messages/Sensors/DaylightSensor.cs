@@ -1,7 +1,6 @@
 ﻿using System;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
-using System.Device.Location;
 using System.Globalization;
 using HueSharp.Converters;
 
