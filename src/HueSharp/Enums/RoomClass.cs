@@ -43,6 +43,8 @@ namespace HueSharp.Enums
         Driveway = 17,
         [Description("Carport")]
         Carport = 18,
+        [Description("TV")]
+        Tv = 19,
         [Description("Other")]
         Other = 255
     }

@@ -2,38 +2,30 @@
 using HueSharp.Messages;
 using HueSharp.Messages.Lights;
 using HueSharp.Messages.Schedules;
-using HueSharp.Net;
 using System;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace HueSharp.Tests
 {
-    public class HueClientScheduleTests
+    public class HueClientScheduleTests : TestBase, IDisposable
     {
-        private const string DEV_USER = "hRls7hTDQwox8oCu0GT-rDlY2rdzo7BWgDfmBzh4";
-        private const string DEV_ADDRESS = @"http://192.168.100.14";
+        private readonly int _tmpScheduleId;
 
-        private HueClient _client;
-        private int _tmpScheduleId;
-
-        public void Setup()
+        public HueClientScheduleTests(ITestOutputHelper outputHelper)
+            : base(outputHelper)
         {
-            _client = new HueClient(DEV_USER, DEV_ADDRESS);
             _tmpScheduleId = CreateTemporarySchedule();
-
-            _client.Log += ClientOnLog;
-
         }
 
-        public void TearDown()
+        public void Dispose()
         {
-            _client.Log -= ClientOnLog;
             DeleteTemporarySchedule(_tmpScheduleId);
         }
 
+        [ExplicitFact]
         public void CreateScheduleTest()
         {
-            var request = new CreateScheduleRequest();
 
             var commandState = new SetLightStateRequest(7) { Status = new SetLightState { IsOn = true, TransitionTime = TimeSpan.FromSeconds(1) } };
 
@@ -49,62 +41,61 @@ namespace HueSharp.Tests
 
             newSchedule.Timing.BaseDate = DateTime.Now.AddDays(1);
 
-            request.NewSchedule = newSchedule;
+            IHueRequest request = new CreateScheduleRequest {NewSchedule = newSchedule};
 
-            IHueResponse response = null;
-
-            response = _client.GetResponse(request);
+            var response = _client.GetResponse(request);
             Assert.True(response is SuccessResponse);
+            OnLog(response);
             Assert.True(newSchedule.Id > 0);
+
             DeleteTemporarySchedule(newSchedule.Id);
         }
 
+        [ExplicitFact]
         public void GetAllSchedulesTest()
         {
-            var request = new GetAllSchedulesRequest();
-            IHueResponse response = null;
+            IHueRequest request = new GetAllSchedulesRequest();
 
-            response = _client.GetResponse(request);
+            var response = _client.GetResponse(request);
             Assert.True(response is GetAllSchedulesResponse);
-
-            ((GetAllSchedulesResponse)response).ForEach(p => Console.WriteLine($"{p.Id} - \"{p.Name}\" ({p.Description}): {p.Timing.ToJson()}"));
+            OnLog(response);
         }
 
+        [ExplicitFact]
         public void GetScheduleTest()
         {
-            var request = new GetScheduleRequest(_tmpScheduleId);
+            IHueRequest request = new GetScheduleRequest(_tmpScheduleId);
 
-            IHueResponse response = null;
-
-            response = _client.GetResponse(request);
+            var response = _client.GetResponse(request);
             Assert.True(response is GetScheduleResponse, "response is GetScheduleResponse");
-            var p = (GetScheduleResponse)response;
-            Console.WriteLine($"{p.Id} - \"{p.Name}\" ({p.Description}): {p.Timing.ToJson()}");
+            OnLog(response);
         }
 
+        [ExplicitFact]
         public void SetScheduleTest()
         {
             const string expectedDescription = "new description";
 
             var mySchedule = _client.GetResponse(new GetScheduleRequest(_tmpScheduleId)) as GetScheduleResponse;
-
             Assert.NotNull(mySchedule);
 
-            var request = new SetScheduleRequest(mySchedule);
-            request.Schedule.Description = expectedDescription;
+            var request = new SetScheduleRequest(mySchedule) {Schedule = {Description = expectedDescription}};
 
-            IHueResponse response = null;
-
-            response = _client.GetResponse(request);
+            var response = _client.GetResponse(request);
             Assert.True(response is SuccessResponse, "response is SuccessResponse");
             Assert.Equal(((SuccessResponse)response)["description"].ToString(), expectedDescription);
+            OnLog(response);
         }
+
+        [ExplicitFact]
         public void DeleteScheduleTest()
         {
-            var request = new DeleteScheduleRequest(CreateTemporarySchedule());
-            IHueResponse response = null;
-            response = _client.GetResponse(request);
+            IHueRequest request = new DeleteScheduleRequest(CreateTemporarySchedule());
+
+            var response = _client.GetResponse(request);
+
             Assert.True(response is SuccessResponse);
+            OnLog(response);
         }
 
         private int CreateTemporarySchedule()
@@ -124,10 +115,10 @@ namespace HueSharp.Tests
             newSchedule.Timing.BaseDate = DateTime.Now.AddDays(1);
             request.NewSchedule = newSchedule;
 
-            IHueResponse response = null;
-
-            response = _client.GetResponse(request);
+            var response = _client.GetResponse(request);
             Assert.True(response is SuccessResponse, "response is SuccessResponse");
+            OnLog(response);
+
             Assert.True(newSchedule.Id > 0, "new ID set");
             return newSchedule.Id;
         }
@@ -137,6 +128,5 @@ namespace HueSharp.Tests
             _client.GetResponse(new DeleteScheduleRequest(id));
         }
 
-        private void ClientOnLog(object sender, string e) => Console.WriteLine(e);
     }
 }

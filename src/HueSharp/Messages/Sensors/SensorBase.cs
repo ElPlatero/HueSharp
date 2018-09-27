@@ -56,6 +56,9 @@ namespace HueSharp.Messages.Sensors
                 case "ZGPSwitch": return new HueTapSensor(jObject);
                 case "ZLLSwitch": return new HueDimmerSensor(jObject);
                 case "CLIPGenericStatus": return new GenericStatusSensor(jObject);
+                case "ZLLTemperature": return new GenericTemperatureSensor(jObject);
+                case "ZLLPresence": return new GenericPresenceSensor(jObject);
+                case "ZLLLightLevel": return new GenericLightLevelSensor(jObject);
                 default: throw new ArgumentException($"Unknown type <{jObject.SelectToken("type")}>");
             }
         }
