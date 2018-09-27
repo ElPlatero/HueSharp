@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using HueSharp.Messages;
 using HueSharp.Messages.Groups;
 using HueSharp.Messages.Lights;
+using HueSharp.Messages.Scenes;
 using HueSharp.Net;
 using Xunit.Abstractions;
 
@@ -41,6 +43,9 @@ namespace HueSharp.Tests
                 case GetAllLightsResponse getAllLightsResponse:
                     OnLog(ToString(getAllLightsResponse));
                     break;
+                case GetAllScenesResponse getAllScenesResponse:
+                    OnLog(ToString(getAllScenesResponse));
+                    break;
                 case SuccessResponse successResponse:
                     OnLog(ToString(successResponse));
                     break;
@@ -70,6 +75,18 @@ namespace HueSharp.Tests
         {
             return $@"{p.Type} ""{p.Name}"": {(p.Status.IsOn ? "on":"off")}, {(p.Status.IsReachable ? "available" : "not available")}";
         }
+
+        private static string ToString(GetSceneResponse p)
+        {
+            return $@"{p.Name}: {string.Join(", ", p.LightIds.Select(q => q.ToString(CultureInfo.InvariantCulture)))}";
+        }
+
+        private static string ToString(GetAllScenesResponse p)
+        {
+            return string.Join(Environment.NewLine, p.Select(ToString));
+        }
+
+
 
         private static string ToString(GetLightStateResponse p)
             => $"{p.Name}: {(p.Status.IsOn ? "on" : "off")}";

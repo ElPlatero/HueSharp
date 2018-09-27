@@ -2,58 +2,49 @@
 using HueSharp.Messages;
 using HueSharp.Messages.Lights;
 using HueSharp.Messages.Scenes;
-using HueSharp.Net;
 using System;
 using System.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace HueSharp.Tests
 {
-    class HueClientSceneTests
+    public class HueClientSceneTests : TestBase, IDisposable
     {
-        private const string DEV_USER = "hRls7hTDQwox8oCu0GT-rDlY2rdzo7BWgDfmBzh4";
-        private const string DEV_ADDRESS = @"http://192.168.100.14";
-
-        private HueClient _client;
-        private string _sceneId;
-        private void ClientOnLog(object sender, string e) => Console.WriteLine(e);
-
-        public void Setup()
+        public HueClientSceneTests(ITestOutputHelper outputHelper)
+            : base(outputHelper)
         {
-            _client = new HueClient(DEV_USER, DEV_ADDRESS);
             _sceneId = CreateTemporaryScene();
-            _client.Log += ClientOnLog;
-
         }
 
-        public void TearDown()
-        {
-            _client.Log -= ClientOnLog;
-            DeleteTemporaryScene(_sceneId);
-        }
+        private readonly string _sceneId;
 
-
+        [ExplicitFact]
         public void GetAllScenesTest()
         {
-            var request = new GetAllScenesRequest();
-            IHueResponse response = null;
+            IHueRequest request = new GetAllScenesRequest();
 
-            response = _client.GetResponse(request);
+            var response = _client.GetResponse(request);
             Assert.True(response is GetAllScenesResponse, "response is of correct type");
-            ((GetAllScenesResponse)response).ForEach(p => Console.WriteLine($"{p.Id} - \"{p.Name}\" ({string.Join(",", p.LightIds.ToArray())}): {p.AppData.Version}"));
+            OnLog(response);
         }
 
+        [ExplicitFact]
         public void GetSceneTest()
         {
-            var request = new GetSceneRequest(_sceneId);
-            IHueResponse response = null;
+            IHueRequest request = new GetSceneRequest(_sceneId);
 
-            response = _client.GetResponse(request);
+            var response = _client.GetResponse(request);
             Assert.True(response is GetSceneResponse, "response is of correct type");
 
-            ((GetSceneResponse)response).LightStates.ToList().ForEach(p => { Console.WriteLine($"{p.LightId}"); Console.WriteLine(p); });
+            ((GetSceneResponse)response).LightStates.ToList().ForEach(p =>
+            {
+                OnLog($"{p.LightId}");
+                OnLog(p.ToString());
+            });
         }
 
+        [ExplicitFact]
         public void CreateSceneTest()
         {
             var request = new CreateSceneRequest
@@ -71,25 +62,25 @@ namespace HueSharp.Tests
                 }
             };
 
-            IHueResponse response = null;
-            response = _client.GetResponse(request);
+            OnLog(_client.GetResponse(request));
             Assert.True(!string.IsNullOrEmpty(request.Parameters.SceneId));
-
             DeleteTemporaryScene(request.Parameters.SceneId);
         }
 
+        [ExplicitFact]
         public void DeleteSceneTest()
         {
-            string id = CreateTemporaryScene();
+            var id = CreateTemporaryScene();
 
-            IHueResponse response = null;
-            response = _client.GetResponse(new DeleteSceneRequest(id));
+            var response = _client.GetResponse(new DeleteSceneRequest(id));
             Assert.True(response is SuccessResponse);
+            OnLog(response);
         }
 
+        [ExplicitFact]
         public void ModifySceneTest()
         {
-            var request = new ModifySceneRequest(new ModifySceneParameters
+            IHueRequest request = new ModifySceneRequest(new ModifySceneParameters
             {
                 SceneId = _sceneId,
                 Name = "new Name",
@@ -97,11 +88,12 @@ namespace HueSharp.Tests
                 UseCurrentStatus = true
             });
 
-            IHueResponse response = null;
-            response = _client.GetResponse(request);
+            var response = _client.GetResponse(request);
             Assert.True(response is SuccessResponse);
+            OnLog(response);
         }
 
+        [ExplicitFact]
         public void ModifySceneLightState()
         {
             IHueRequest request = new ModifySceneRequest(new ModifySceneParameters
@@ -111,8 +103,7 @@ namespace HueSharp.Tests
                 UseCurrentStatus = true
             });
 
-            IHueResponse response = null;
-            response = _client.GetResponse(request);
+            _client.GetResponse(request);
 
             request = new ModifySceneLightStateRequest(_sceneId, 7)
             {
@@ -123,8 +114,9 @@ namespace HueSharp.Tests
                 }
             };
 
-            response = _client.GetResponse(request);
+            var response = _client.GetResponse(request);
             Assert.True(response is SuccessResponse);
+            OnLog(response);
         }
 
         private string CreateTemporaryScene()
@@ -137,17 +129,20 @@ namespace HueSharp.Tests
                     LightIds = new[] { 2, 3, 4 }
                 }
             };
-            IHueResponse response = null;
-            response = _client.GetResponse(request);
+            var response = _client.GetResponse(request);
             Assert.True(response is SuccessResponse);
             return request.Parameters.SceneId;
         }
 
         private void DeleteTemporaryScene(string id)
         {
-            IHueResponse response = null;
-            response = _client.GetResponse(new DeleteSceneRequest(id));
+            var response = _client.GetResponse(new DeleteSceneRequest(id));
             Assert.True(response is SuccessResponse);
+        }
+
+        public void Dispose()
+        {
+            DeleteTemporaryScene(_sceneId);
         }
     }
 }
