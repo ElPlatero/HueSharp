@@ -1,8 +1,4 @@
-﻿using HueSharp.Enums;
-using HueSharp.Messages;
-using HueSharp.Messages.Groups;
-using HueSharp.Messages.Schedules;
-using HueSharp.Net;
+﻿using HueSharp.Messages.Schedules;
 using System;
 using System.Collections;
 using System.Collections.Generic;
