@@ -9,6 +9,7 @@ namespace HueSharp.Enums
         LightGroup = 1,
         Room = 2,
         Luminaire = 3,
-        LightSource = 4
+        LightSource = 4,
+        Entertainment = 5
     }
 }
