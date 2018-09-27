@@ -6,6 +6,7 @@ using HueSharp.Messages.Groups;
 using HueSharp.Messages.Lights;
 using HueSharp.Messages.Scenes;
 using HueSharp.Messages.Schedules;
+using HueSharp.Messages.Sensors;
 using HueSharp.Net;
 using Xunit.Abstractions;
 
@@ -49,6 +50,9 @@ namespace HueSharp.Tests
                     break;
                 case GetAllSchedulesResponse getAllSchedulesResponse:
                     OnLog(ToString(getAllSchedulesResponse));
+                    break;
+                case GetAllSensorsResponse getAllSensorsResponse:
+                    OnLog(ToString(getAllSensorsResponse));
                     break;
                 case SuccessResponse successResponse:
                     OnLog(ToString(successResponse));
@@ -100,6 +104,15 @@ namespace HueSharp.Tests
             return string.Join(Environment.NewLine, p.Select(ToString));
         }
 
+        private static string ToString(SensorBase p)
+        {
+            return $@"{p.Name}: {p.Type}, {p.ManufacturerName}";
+        }
+
+        private static string ToString(GetAllSensorsResponse p)
+        {
+            return string.Join(Environment.NewLine, p.Select(ToString));
+        }
 
 
         private static string ToString(GetLightStateResponse p)

@@ -35,6 +35,6 @@ namespace HueSharp.Messages.Sensors
     public class GenericStatusSensorState
     {
         [JsonProperty(PropertyName = "status")]
-        public int Status { get; set; }
+        public int? Status { get; set; }
     }
 }
