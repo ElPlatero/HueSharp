@@ -4,6 +4,7 @@ using HueSharp.Messages.Lights;
 using HueSharp.Messages.Scenes;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -14,27 +15,27 @@ namespace HueSharp.Tests
         public HueClientSceneTests(ITestOutputHelper outputHelper)
             : base(outputHelper)
         {
-            _sceneId = CreateTemporaryScene();
+            CreateTemporaryScene().Wait();
         }
 
-        private readonly string _sceneId;
+        private string _sceneId;
 
         [ExplicitFact]
-        public void GetAllScenesTest()
+        public async Task GetAllScenesTest()
         {
             IHueRequest request = new GetAllScenesRequest();
 
-            var response = _client.GetResponse(request);
+            var response = await _client.GetResponseAsync(request);
             Assert.True(response is GetAllScenesResponse, "response is of correct type");
             OnLog(response);
         }
 
         [ExplicitFact]
-        public void GetSceneTest()
+        public async Task GetSceneTest()
         {
             IHueRequest request = new GetSceneRequest(_sceneId);
 
-            var response = _client.GetResponse(request);
+            var response = await _client.GetResponseAsync(request);
             Assert.True(response is GetSceneResponse, "response is of correct type");
 
             ((GetSceneResponse)response).LightStates.ToList().ForEach(p =>
@@ -45,7 +46,7 @@ namespace HueSharp.Tests
         }
 
         [ExplicitFact]
-        public void CreateSceneTest()
+        public async Task CreateSceneTest()
         {
             var request = new CreateSceneRequest
             {
@@ -62,23 +63,25 @@ namespace HueSharp.Tests
                 }
             };
 
-            OnLog(_client.GetResponse(request));
+            OnLog(await _client.GetResponseAsync(request));
             Assert.True(!string.IsNullOrEmpty(request.Parameters.SceneId));
-            DeleteTemporaryScene(request.Parameters.SceneId);
+            DeleteTemporaryScene(request.Parameters.SceneId).Wait();
         }
 
         [ExplicitFact]
-        public void DeleteSceneTest()
+        public async Task DeleteSceneTest()
         {
-            var id = CreateTemporaryScene();
+            var backup = _sceneId;
+            CreateTemporaryScene().Wait();
 
-            var response = _client.GetResponse(new DeleteSceneRequest(id));
+            var response = await _client.GetResponseAsync(new DeleteSceneRequest(_sceneId));
             Assert.True(response is SuccessResponse);
             OnLog(response);
+            _sceneId = backup;
         }
 
         [ExplicitFact]
-        public void ModifySceneTest()
+        public async Task ModifySceneTest()
         {
             IHueRequest request = new ModifySceneRequest(new ModifySceneParameters
             {
@@ -88,13 +91,13 @@ namespace HueSharp.Tests
                 UseCurrentStatus = true
             });
 
-            var response = _client.GetResponse(request);
+            var response = await _client.GetResponseAsync(request);
             Assert.True(response is SuccessResponse);
             OnLog(response);
         }
 
         [ExplicitFact]
-        public void ModifySceneLightState()
+        public async Task ModifySceneLightState()
         {
             IHueRequest request = new ModifySceneRequest(new ModifySceneParameters
             {
@@ -103,7 +106,7 @@ namespace HueSharp.Tests
                 UseCurrentStatus = true
             });
 
-            _client.GetResponse(request);
+            _client.GetResponseAsync(request).Wait();
 
             request = new ModifySceneLightStateRequest(_sceneId, 7)
             {
@@ -114,12 +117,12 @@ namespace HueSharp.Tests
                 }
             };
 
-            var response = _client.GetResponse(request);
+            var response = await _client.GetResponseAsync(request);
             Assert.True(response is SuccessResponse);
             OnLog(response);
         }
 
-        private string CreateTemporaryScene()
+        private Task CreateTemporaryScene()
         {
             var request = new CreateSceneRequest
             {
@@ -129,20 +132,23 @@ namespace HueSharp.Tests
                     LightIds = new[] { 2, 3, 4 }
                 }
             };
-            var response = _client.GetResponse(request);
-            Assert.True(response is SuccessResponse);
-            return request.Parameters.SceneId;
+            return _client.GetResponseAsync(request).ContinueWith(p =>
+            {
+                var response = p.Result;
+                Assert.True(response is SuccessResponse);
+                _sceneId = request.Parameters.SceneId;
+            });
         }
 
-        private void DeleteTemporaryScene(string id)
+        private async Task DeleteTemporaryScene(string id)
         {
-            var response = _client.GetResponse(new DeleteSceneRequest(id));
+            var response = await _client.GetResponseAsync(new DeleteSceneRequest(id));
             Assert.True(response is SuccessResponse);
         }
 
         public void Dispose()
         {
-            DeleteTemporaryScene(_sceneId);
+            DeleteTemporaryScene(_sceneId).Wait();
         }
     }
 }

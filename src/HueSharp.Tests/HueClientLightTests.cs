@@ -2,6 +2,7 @@
 using HueSharp.Messages.Lights;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using HueSharp.Enums;
 using Xunit;
 using Xunit.Abstractions;
@@ -15,11 +16,11 @@ namespace HueSharp.Tests
 
 
         [ExplicitFact]
-        public void GetLightStateTest()
+        public async Task GetLightStateTest()
         {
             var request = new GetLightStateRequest {LightId = 7};
 
-            var response = _client.GetResponse(request);
+            var response = await _client.GetResponseAsync(request);
 
             Assert.True(response != null);
             Assert.True(response.GetType() != typeof(ErrorResponse));
@@ -28,10 +29,10 @@ namespace HueSharp.Tests
         }
 
         [ExplicitFact]
-        public void SetLightStateTest()
+        public async Task SetLightStateTest()
         {
             IHueRequest request = new GetLightStateRequest(7);
-            var response = _client.GetResponse(request) as GetLightStateResponse;
+            var response = await _client.GetResponseAsync(request) as GetLightStateResponse;
             Assert.NotNull(response);
 
             request = new SetLightStateRequest(7);
@@ -42,66 +43,64 @@ namespace HueSharp.Tests
                 ((SetLightStateRequest) request).Status.Effect = LightEffect.ColorLoop;
             }
 
-            _client.GetResponse(request);
+            _client.GetResponseAsync(request).Wait();
 
             Assert.True(!((SetLightStateRequest)request).Status.HasUnsavedChanges);
          }
 
         [ExplicitFact]
-        public void GetAllLightsTest()
+        public async Task GetAllLightsTest()
         {
             IHueRequest request = new GetAllLightsRequest();
 
-            var response = _client.GetResponse(request);
+            var response = await _client.GetResponseAsync(request);
             Assert.True(response is GetAllLightsResponse);
 
             OnLog(response);
         }
 
         [ExplicitFact]
-        public void CreateErrorObjectTest()
+        public async Task CreateErrorObjectTest()
         {
             IHueRequest initialRequest = new GetAllLightsRequest();
-            var initialResponse = (GetAllLightsResponse)_client.GetResponse(initialRequest);
+            var initialResponse = (GetAllLightsResponse)await _client.GetResponseAsync(initialRequest);
             var id = initialResponse.First(p => !p.Status.IsOn).Id;
 
-            var request = new SetLightStateRequest(id);
-            request.Status.BrightnessIncrement = 100;
+            var request = new SetLightStateRequest(id) {Status = {BrightnessIncrement = 100}};
 
-            IHueResponse result = null;
-            Assert.Throws<HueResponseException>(() => result = _client.GetResponse(request));
+            await Assert.ThrowsAsync<HueResponseException>(() => _client.GetResponseAsync(request));
         }
 
         [ExplicitFact]
-        public void GetNewLightsTest()
+        public async Task GetNewLightsTest()
         {
             IHueRequest request = new GetNewLightsRequest();
 
-            var response = _client.GetResponse(request);
+            var response = await _client.GetResponseAsync(request);
             Assert.True(response is GetNewLightsResponse);
             Assert.Empty((GetNewLightsResponse)response);
         }
 
         [ExplicitFact]
-        public void SearchNewLightsTest()
+        public async Task SearchNewLightsTest()
         {
             IHueRequest request = new SearchNewLightsRequest();
 
-            var response = _client.GetResponse(request);
+            var response = await _client.GetResponseAsync(request);
             Assert.True(response is SuccessResponse);
 
             request = new GetNewLightsRequest();
-            response = _client.GetResponse(request);
+            response = await _client.GetResponseAsync(request);
             Assert.True(response is GetNewLightsResponse);
             Assert.True(((GetNewLightsResponse)response).LastScan == DateTime.MaxValue);
         }
 
         [ExplicitFact]
-        public void SetLightAttributesTest()
+        public async Task SetLightAttributesTest()
         {
             IHueRequest request = new SetLightAttributesRequest(7, "Testname");
 
-            var response = _client.GetResponse(request);
+            var response = await _client.GetResponseAsync(request);
 
             Assert.True(response != null);
             Assert.True(response is SuccessResponse);
@@ -109,13 +108,10 @@ namespace HueSharp.Tests
         }
 
         [ExplicitFact]
-        public void DeleteLightTest()
+        public async Task DeleteLightTest()
         {
             var request = new DeleteLightRequest(7);
-
-            IHueResponse response = null;
-            Assert.Throws<ArgumentException>(() => response = _client.GetResponse(request));
-            Assert.Null(response);
+            await Assert.ThrowsAsync<ArgumentException>(() => _client.GetResponseAsync(request));
         }
 
     }

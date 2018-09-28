@@ -1,124 +1,89 @@
-﻿ using HueSharp.Messages;
+﻿using HueSharp.Messages;
 using System;
-using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace HueSharp.Net
 {
-    public class HueClient : ILoggable
+    public class HueClient
     {
+        private readonly ILogger _logger;
         public Uri BaseAddress { get; set; }
-        public string User { get; private set; }
-        public event EventHandler<string> Log;
+        public string User { get; }
 
-        public HueClient(string user) : this(user, (Uri)null) { }
-        public HueClient(string user, string address) : this(user, new Uri(address)) { }
-        public HueClient(string user, IPAddress address) : this(user, new Uri(string.Format("http://{0}", address.ToString()))) { }
-        public HueClient(string user, Uri baseAddress)
+        public HueClient(ILoggerFactory loggerFactory, string user) : this(loggerFactory, user, (Uri)null) { }
+        public HueClient(ILoggerFactory loggerFactory, string user, string address) : this(loggerFactory, user, new Uri(address)) { }
+        public HueClient(ILoggerFactory loggerFactory, string user, IPAddress address) : this(loggerFactory, user, new Uri($"http://{address}")) { }
+        public HueClient(ILoggerFactory loggerFactory, string user, Uri baseAddress)
         {
-            OnLog("Hue client created.");
+            _logger = loggerFactory == null ? new NullLogger<HueClient>() : loggerFactory.CreateLogger<HueClient>();
+            LogTrace("Hue client created.");
+
             User = user;
             BaseAddress = baseAddress;
         }
 
-        public IHueResponse GetResponse(IHueRequest hueRequest)
+        public async Task<IHueResponse> GetResponseAsync(IHueRequest hueRequest)
         {
-            var setsCommand = hueRequest as IContainsCommand;
-            if(setsCommand != null)
-                setsCommand.Command.CompleteAddress = $"/api/{User}/{setsCommand.Command.Address}";
-
-
-            hueRequest.Log += OnLog;
-            OnLog("Preparing {1}-request to \"{0}\".", GetRequestUri(hueRequest.Address), hueRequest.Method.ToString().ToUpper());
-
-            if (hueRequest.Method == HttpMethod.Get)
+            if (hueRequest is IContainsCommand setsCommand)
             {
-                HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(GetRequestUri(hueRequest.Address));
-                try
-                {
-                    using (var response = httpRequest.GetResponse())
-                    using (var responseStream = response.GetResponseStream())
-                    using (var reader = new StreamReader(responseStream, Encoding.UTF8))
-                    {
+                setsCommand.Command.CompleteAddress = $"/api/{User}/{setsCommand.Command.Address}";
+            }
 
-                        var result = hueRequest.GetResponse(reader.ReadToEnd());
-                        OnLog("Request completed.");
-                        return result;
-                    }
-                }
-                catch (WebException ex)
-                {
-                    OnLog(string.Format("WebException caught: {0}", ex.Message));
-                    using (var errorResponse = ex.Response)
-                    using (var responseStream = errorResponse.GetResponseStream())
-                    using (var reader = new StreamReader(responseStream, Encoding.GetEncoding("utf-8")))
-                    {
-                        var errorText = reader.ReadToEnd();
-                        OnLog(errorText);
-                        throw;
-                    }
-                }
+            var uri = GetRequestUri(hueRequest.Address);
+
+            LogTrace(@"Preparing {method}-request to ""{uri}"".", hueRequest.Method.Method, uri);
+            var requestMessage = new HttpRequestMessage(hueRequest.Method, uri);
+
+
+            if (hueRequest is IUploadable uploadableRequest)
+            {
+                var requestContent = uploadableRequest.GetRequestBody();
+                LogTrace($"Preparing json to send: {Environment.NewLine}{requestContent}");
+                requestMessage.Content = new StringContent(requestContent, Encoding.UTF8);
             }
             else
             {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(GetRequestUri(hueRequest.Address));
-                request.Method = hueRequest.Method.ToString().ToUpper();
+                requestMessage.Content = new StringContent(string.Empty);
+            }
 
-                if (hueRequest is IUploadable)
+            using (var client = GetClient())
+            using (var response = await client.SendAsync(requestMessage))
+            {
+                if (response.IsSuccessStatusCode)
                 {
-                    var requestBody = ((IUploadable)hueRequest).GetRequestBody();
-                    OnLog("Preparing json to send: {0}{1}", Environment.NewLine, requestBody);
-                    var byteArray = Encoding.UTF8.GetBytes(requestBody);
+                    var responseString = await response.Content.ReadAsStringAsync();
+                    LogTrace(responseString);
+                    return hueRequest.GetResponse(responseString);
+                }
 
-                    request.ContentLength = byteArray.Length;
-                    request.ContentType = @"application/json";
-
-                    using (var dataStream = request.GetRequestStream())
-                    {
-                        dataStream.Write(byteArray, 0, byteArray.Length);
-                        OnLog("Data successfully sent.");
-                    }
-                }
-                try
-                {
-                    using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-                    using (var responseStream = response.GetResponseStream())
-                    using (var reader = new StreamReader(responseStream, Encoding.UTF8))
-                    {
-                        var result = hueRequest.GetResponse(reader.ReadToEnd());
-                        OnLog("Request completed.");
-                        return result;
-                    }
-                }
-                catch (WebException ex)
-                {
-                    OnLog(string.Format("WebException caught: {0}", ex.Message));
-                    using (var errorResponse = ex.Response)
-                    using (var responseStream = errorResponse.GetResponseStream())
-                    using (var reader = new StreamReader(responseStream, Encoding.GetEncoding("utf-8")))
-                    {
-                        var errorText = reader.ReadToEnd();
-                        OnLog(errorText);
-                        throw;
-                    }
-                }
+                LogError($"Error getting response from hub, HttpStatus {response.StatusCode}");
+                LogDebug(await response.Content.ReadAsStringAsync());
+                throw new HttpRequestException();
             }
         }
 
-        private Uri GetRequestUri(string relativePath)
+        private HttpClient GetClient()
         {
-            return new Uri(BaseAddress, string.Format("api/{0}/{1}", User, relativePath));
+            var client = new HttpClient();
+            client.DefaultRequestHeaders
+                .Accept
+                .Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            return client;
         }
 
-        private void OnLog(object sender, string message)
-        {
-            Log?.Invoke(this, message);
-        }
-        private void OnLog(string formatString, params object[] parameters)
-        {
-            OnLog(this, string.Format(formatString, parameters));
-        }
+        private Uri GetRequestUri(string relativePath) => new Uri(BaseAddress, $"api/{User}/{relativePath}");
+
+        private void LogTrace(string message, params object[] parms) => _logger.LogTrace(message, parms);
+        private void LogDebug(string message, params object[] parms) => _logger.LogDebug(message, parms);
+        private void LogWarning(string message, params object[] parms) => _logger.LogWarning(message, parms);
+        private void LogError(string message, params object[] parms) => _logger.LogError(message, parms);
+        private void LogCritical(string message, params object[] parms) => _logger.LogCritical(message, parms);
+
     }
 }

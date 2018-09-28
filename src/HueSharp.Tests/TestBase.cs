@@ -8,26 +8,28 @@ using HueSharp.Messages.Scenes;
 using HueSharp.Messages.Schedules;
 using HueSharp.Messages.Sensors;
 using HueSharp.Net;
+using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;
 
 namespace HueSharp.Tests
 {
     public abstract class TestBase
     {
-        private readonly ITestOutputHelper _outputHelper;
         private const string DEV_USER = "hRls7hTDQwox8oCu0GT-rDlY2rdzo7BWgDfmBzh4";
         private const string DEV_ADDRESS = @"http://192.168.178.46/";
 
         protected HueClient _client;
+        private readonly ILogger _logger;
 
         protected TestBase(ITestOutputHelper outputHelper)
         {
-            _outputHelper = outputHelper;
-            _client = new HueClient(DEV_USER, DEV_ADDRESS);
-            _client.Log += OnLog;
+            var loggerFactory = new LoggerFactory();
+            loggerFactory.AddProvider(new XunitLoggerProvider(outputHelper));
+            _client = new HueClient(loggerFactory, DEV_USER, DEV_ADDRESS);
+            _logger = loggerFactory.CreateLogger(GetType().Name);
         }
 
-        protected void OnLog(string message) => OnLog(this, message);
+        protected void OnLog(string message) => _logger.LogDebug(message);
 
         protected void OnLog(IHueResponse response)
         {
@@ -60,9 +62,6 @@ namespace HueSharp.Tests
             }
         }
 
-
-        private void OnLog(object sender, string message)
-            => _outputHelper.WriteLine($"{sender.GetType().Name}: {message}");
 
         private static string ToString(GetAllGroupsResponse p)
         {
