@@ -5,13 +5,13 @@
     <Authors>Tino Schüttpelz</Authors>
     <Company />
     <Description>A C# wrapper to communicate with a Phillips Hue Hub (or act as one).</Description>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <Copyright>MIT</Copyright>
     <PackageLicenseUrl>https://github.com/ElPlatero/HueSharp/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/ElPlatero/HueSharp</PackageProjectUrl>
     <RepositoryUrl>https://github.com/ElPlatero/HueSharp</RepositoryUrl>
     <PackageTags>Hue</PackageTags>
-    <PackageReleaseNotes>initial release on nuget, old (pre-netstandard) codebase</PackageReleaseNotes>
+    <PackageReleaseNotes>breaking change: client GetResponse is now GetResponseAsync. Synchronous methods have been scrapped.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
