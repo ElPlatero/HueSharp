@@ -1,14 +1,8 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Net.Http;
 
 namespace HueSharp.Messages
 {
-    public interface IHueRequest : ILoggable
+    public interface IHueRequest
     {
         HttpMethod Method { get; }
         string Address { get; }

@@ -2,6 +2,7 @@
 using HueSharp.Messages.Sensors;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -12,13 +13,13 @@ namespace HueSharp.Tests
         public HueClientSensorTests(ITestOutputHelper outputHelper)
             : base(outputHelper)
         {
-            _tmpSensorId = CreateTmpSensor();
+            _tmpSensorId = CreateTmpSensorAsync().Result;
         }
 
         #region Hue Test Setup/TearDown
         private readonly int _tmpSensorId;
 
-        private int CreateTmpSensor()
+        private Task<int> CreateTmpSensorAsync()
         {
             var request = new CreateSensorRequest
             {
@@ -37,46 +38,51 @@ namespace HueSharp.Tests
                 }
             };
 
-            _client.GetResponse(request);
-            return request.Sensor.Id;
+            return _client.GetResponseAsync(request).ContinueWith(p =>
+            {
+                p.Wait();
+                return request.Sensor.Id;
+            });
         }
 
-        private void DeleteTmpSensor()
+        private Task DeleteTmpSensorAsync()
         {
             OnLog("Teardown: deleteing temporary sensors");
             IHueRequest request = new GetAllSensorsRequest();
-            var tempSensors = ((GetAllSensorsResponse) _client.GetResponse(request)).Where(p => p.ModelId == "TMPSENSOR").ToList();
 
-            foreach (var sensor in tempSensors)
+            return _client.GetResponseAsync(request).ContinueWith(getAllSensors =>
             {
-                request = new DeleteSensorRequest(sensor.Id);
-                var response = _client.GetResponse(request);
-                Assert.True(response is SuccessResponse);
-                OnLog(response);
-            }
-            OnLog("Teardown complete.");
+                var tempSensors = ((GetAllSensorsResponse) getAllSensors.Result).Where(p => p.ModelId == "TMPSENSOR")
+                    .ToList();
+                Task.WhenAll(tempSensors.Select(p => _client.GetResponseAsync(new DeleteSensorRequest(p.Id)).ContinueWith(deleteResponse =>
+                {
+                    var deleteResponseResult = deleteResponse.Result;
+                    Assert.True(deleteResponseResult is SuccessResponse);
+                    OnLog(deleteResponseResult);
+                }))).Wait();
+            });
         }
 
         public void Dispose()
         {
-            DeleteTmpSensor();
+            DeleteTmpSensorAsync().Wait();
         }
         #endregion
 
         #region tests
         [ExplicitFact]
-        public void GetAllSensorsTest()
+        public async Task GetAllSensorsTest()
         {
             IHueRequest request = new GetAllSensorsRequest();
 
-            var response = _client.GetResponse(request);
+            var response = await _client.GetResponseAsync(request);
 
             Assert.True(response is GetAllSensorsResponse);
             OnLog(response);
         }
 
         [ExplicitFact]
-        public void CreateSensorTest()
+        public async Task CreateSensorTest()
         {
             IHueRequest request = new CreateSensorRequest
             {
@@ -99,7 +105,7 @@ namespace HueSharp.Tests
                 }
             };
 
-            var response = _client.GetResponse(request);
+            var response = await _client.GetResponseAsync(request);
 
             Assert.True(response is SuccessResponse);
             OnLog(response);
@@ -107,30 +113,30 @@ namespace HueSharp.Tests
         }
 
         [ExplicitFact]
-        public void FindNewSensorsTest()
+        public async Task FindNewSensorsTest()
         {
             IHueRequest request = new FindNewSensorsRequest();
 
-            var response = _client.GetResponse(request);
+            var response = await _client.GetResponseAsync(request);
             Assert.True(response is SuccessResponse);
             OnLog(response);
         }
 
         [ExplicitFact]
-        public void GetNewSensorsTest()
+        public async Task GetNewSensorsTest()
         {
             IHueRequest request = new GetNewSensorsRequest();
 
-            var response = _client.GetResponse(request);
+            var response = await _client.GetResponseAsync(request);
             Assert.True(response is GetNewSensorsResponse);
         }
 
         [ExplicitFact]
-        public void GetSensorTest()
+        public async Task GetSensorTest()
         {
             IHueRequest request = new GetSensorRequest(1);
 
-            var response = _client.GetResponse(request);
+            var response = await _client.GetResponseAsync(request);
 
             Assert.True(response is GetSensorResponse);
             Assert.True(((GetSensorResponse)response).Sensor is DaylightSensor);
@@ -138,37 +144,49 @@ namespace HueSharp.Tests
         }
 
         [ExplicitFact]
-        public void UpdateSensorTest()
+        public async Task UpdateSensorTest()
         {
             IHueRequest request = new UpdateSensorRequest(2, "Schalter Schlafzimmer");
 
-            var response = _client.GetResponse(request);
+            var response = await _client.GetResponseAsync(request);
             Assert.True(response is SuccessResponse);
             OnLog(response);
         }
 
         [ExplicitFact]
-        public void ChangeSensorConfigTest()
+        public Task ChangeSensorConfigTest()
         {
-            var sensor = ((GetSensorResponse)_client.GetResponse(new GetSensorRequest(_tmpSensorId))).Sensor;
-            ((GenericStatusSensorConfiguration)sensor.Configuration).IsOn = false;
+            return _client.GetResponseAsync(new GetSensorRequest(_tmpSensorId)).ContinueWith(getSensor =>
+            {
+                var sensor = ((GetSensorResponse) getSensor.Result).Sensor;
+                ((GenericStatusSensorConfiguration) sensor.Configuration).IsOn = false;
 
-            var request = new ChangeSensorConfigRequest(sensor);
-            var response = _client.GetResponse(request);
-            Assert.True(response is SuccessResponse);
-            OnLog(response);
+                var request = new ChangeSensorConfigRequest(sensor);
+                _client.GetResponseAsync(request).ContinueWith(changeSensor =>
+                {
+                    var response = changeSensor.Result;
+                    Assert.True(response is SuccessResponse);
+                    OnLog(response);
+                });
+            });
         }
 
         [ExplicitFact]
-        public void ChangeSensorStateTest()
+        public Task ChangeSensorStateTest()
         {
-            var sensor = ((GetSensorResponse)_client.GetResponse(new GetSensorRequest(_tmpSensorId))).Sensor;
-            ((GenericStatusSensorState)sensor.State).Status = 20;
+            return _client.GetResponseAsync(new GetSensorRequest(_tmpSensorId)).ContinueWith(getSensor =>
+            {
+                var sensor = ((GetSensorResponse) getSensor.Result).Sensor;
+                ((GenericStatusSensorState) sensor.State).Status = 20;
 
-            IHueRequest request = new ChangeSensorStateRequest(sensor);
-            var response = _client.GetResponse(request);
-            Assert.True(response is SuccessResponse);
-            OnLog(response);
+                IHueRequest request = new ChangeSensorStateRequest(sensor);
+                _client.GetResponseAsync(request).ContinueWith(changeSensor =>
+                {
+                    var response = changeSensor.Result;
+                    Assert.True(response is SuccessResponse);
+                    OnLog(response);
+                });
+            });
         }
         #endregion
     }

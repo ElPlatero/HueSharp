@@ -1,6 +1,7 @@
 ﻿using HueSharp.Messages;
 using HueSharp.Messages.Groups;
 using System;
+using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -13,71 +14,71 @@ namespace HueSharp.Tests
 
 
         [ExplicitFact]
-        public void GetAllGroupsTest()
+        public async Task GetAllGroupsTest()
         {
             var request = new GetAllGroupsRequest();
 
-            var response = _client.GetResponse(request);
+            var response = await _client.GetResponseAsync(request);
             Assert.True(response is GetAllGroupsResponse);
 
             OnLog(response);
         }
 
         [ExplicitFact]
-        public void GetGroupTest()
+        public async Task GetGroupTest()
         {
             var request = new GetGroupRequest(3);
 
-            var response = _client.GetResponse(request);
+            var response = await _client.GetResponseAsync(request);
             Assert.True(response is GetGroupResponse);
 
             OnLog(response);
         }
 
         [ExplicitFact]
-        public void SetGroupTest()
+        public async Task SetGroupTest()
         {
             IHueRequest request = new GetGroupRequest(1);
-            IHueResponse response = _client.GetResponse(request);
+            IHueResponse response = await _client.GetResponseAsync(request);
 
             OnLog(response);
 
             request = new SetGroupRequest((GetGroupResponse)response);
             ((SetGroupRequest)request).NewName = "Testname";
 
-            response = _client.GetResponse(request);
+            response = await _client.GetResponseAsync(request);
             Assert.True(response is SuccessResponse);
 
             OnLog(response);
         }
 
         [ExplicitFact]
-        public void SetGroupStateTest()
+        public async Task SetGroupStateTest()
         {
             IHueRequest request = new SetGroupStateRequest(3, new SetGroupState { IsOn = false });
 
-            IHueResponse response = _client.GetResponse(request);
+            IHueResponse response = await _client.GetResponseAsync(request);
 
             Assert.True(response is SuccessResponse);
             OnLog(response);
         }
 
         [ExplicitFact]
-        public void CreateAndDeleteGroupTest()
+        public async Task CreateAndDeleteGroupTest()
         {
             IHueRequest request = new CreateGroupRequest("tmp testgroup", 6, 7);
 
-            IHueResponse response = _client.GetResponse(request);
+            IHueResponse response = await _client.GetResponseAsync(request);
             Assert.True(response is SuccessResponse);
 
             var newGroupId = Convert.ToInt32(((SuccessResponse)response)["id"]);
 
             request = new DeleteGroupRequest(newGroupId);
 
-            Assert.Throws<ArgumentException>(() => response = _client.GetResponse(request));
+            await Assert.ThrowsAsync<ArgumentException>(async () => response = await _client.GetResponseAsync(request));
             ((DeleteGroupRequest)request).Acknowledge();
 
-            response = _client.GetResponse(request);
+            response = await _client.GetResponseAsync(request);
             Assert.True(response is SuccessResponse);
 
             OnLog(response);

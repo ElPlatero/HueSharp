@@ -42,3 +42,6 @@ Thumbs.db
 /fritzbox-settings.json
 /publish.ps1
 /*.user
+/src/HueSharp/Properties
+/src/HueSharp/*.user
+/src/*.user
