@@ -32,19 +32,19 @@ namespace HueSharp.Tests
         [ExplicitFact]
         public async Task SetLightStateTest()
         {
-            const int LIGHT_ID = 7;
+            const int LIGHT_ID = 4;
 
             IHueRequest request = HueRequestBuilder.Select.Light(LIGHT_ID).Build();
             var response = await _client.GetResponseAsync(request);
             Assert.True(response is IHueStatusMessage);
 
             var builder = HueRequestBuilder.Modify.Light(LIGHT_ID);
-            if (((IHueStatusMessage)response).Status.IsOn) builder.TurnOff();
+            if (((IHueStatusMessage)response).Status.IsOn) builder.During(TimeSpan.FromSeconds(10)).TurnOff();
             else
             {
                 builder
                     .TurnOn()
-                    .Hue(new Random().Next(0, ushort.MaxValue))
+                    .Color(46920, 254, 254)
                     .ColorLoop();
             }
 
