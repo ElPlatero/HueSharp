@@ -32,11 +32,13 @@ namespace HueSharp.Tests
         [ExplicitFact]
         public async Task SetLightStateTest()
         {
-            IHueRequest request = HueRequestBuilder.Select.Light(7).Build();
+            const int LIGHT_ID = 7;
+
+            IHueRequest request = HueRequestBuilder.Select.Light(LIGHT_ID).Build();
             var response = await _client.GetResponseAsync(request);
             Assert.True(response is IHueStatusMessage);
 
-            var builder = HueRequestBuilder.Modify.Light(7);
+            var builder = HueRequestBuilder.Modify.Light(LIGHT_ID);
             if (((IHueStatusMessage)response).Status.IsOn) builder.TurnOff();
             else
             {

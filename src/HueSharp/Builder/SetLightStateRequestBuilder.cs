@@ -1,4 +1,5 @@
-﻿using HueSharp.Messages;
+﻿using HueSharp.Enums;
+using HueSharp.Messages;
 using HueSharp.Messages.Lights;
 
 namespace HueSharp.Builder
@@ -127,6 +128,7 @@ namespace HueSharp.Builder
             if (_hueInc.HasValue) ((SetLightState)result.Status).HueIncrement = (short)_hueInc.Value;
             if (_satInc.HasValue) ((SetLightState)result.Status).SaturationIncrement = (short)_satInc.Value;
             if (_briInc.HasValue) ((SetLightState)result.Status).BrightnessIncrement = (short)_briInc.Value;
+            if (_loop.HasValue) result.Status.Effect = _loop.Value ? LightEffect.ColorLoop : LightEffect.None;
             return result;
         }
     }
