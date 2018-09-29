@@ -4,6 +4,7 @@ using HueSharp.Messages.Lights;
 using HueSharp.Messages.Schedules;
 using System;
 using System.Threading.Tasks;
+using HueSharp.Builder;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -28,15 +29,14 @@ namespace HueSharp.Tests
         public async Task CreateScheduleTest()
         {
 
-            var commandState = new SetLightStateRequest(7) { Status = new SetLightState { IsOn = true, TransitionTime = TimeSpan.FromSeconds(1) } };
-
+            var commandState = HueRequestBuilder.Modify.Light(7).TurnOn().Build();
             var newSchedule = new GetScheduleResponse
             {
                 AutoDelete = true,
                 Name = "new Timer",
                 Description = "testing that scheduling",
                 Timing = ScheduleTiming.CreateNew(ScheduleTimingTypes.Alarm),
-                Command = new Command(commandState, p => ((SetLightStateRequest)p).Status),
+                Command = new Command(commandState),
                 Status = ScheduleStatus.Enabled
             };
 
@@ -102,14 +102,14 @@ namespace HueSharp.Tests
         private async Task<int> CreateTemporarySchedule()
         {
             var request = new CreateScheduleRequest();
-            var commandState = new SetLightStateRequest(7) { Status = new SetLightState { IsOn = true, TransitionTime = TimeSpan.FromSeconds(1) } };
+            var commandState = HueRequestBuilder.Modify.Light(7).TurnOn().Build();
             var newSchedule = new GetScheduleResponse
             {
                 AutoDelete = true,
                 Name = "temporary schedule",
                 Description = "temporary schedule description",
                 Timing = ScheduleTiming.CreateNew(ScheduleTimingTypes.Alarm),
-                Command = new Command(commandState, p => ((SetLightStateRequest)p).Status),
+                Command = new Command(commandState),
                 Status = ScheduleStatus.Enabled
             };
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using HueSharp.Messages;
@@ -41,11 +42,11 @@ namespace HueSharp.Tests
                 case GetAllGroupsResponse getAllGroupsResponse:
                     OnLog(ToString(getAllGroupsResponse));
                     break;
-                case GetLightStateResponse getLightStateResponse:
-                    OnLog(ToString(getLightStateResponse));
+                case IHueStatusMessage statusMessage:
+                    OnLog(ToString(statusMessage));
                     break;
-                case GetAllLightsResponse getAllLightsResponse:
-                    OnLog(ToString(getAllLightsResponse));
+                case ICollection<Light> lightCollection:
+                    OnLog(ToString(lightCollection));
                     break;
                 case GetAllScenesResponse getAllScenesResponse:
                     OnLog(ToString(getAllScenesResponse));
@@ -68,7 +69,7 @@ namespace HueSharp.Tests
             return string.Join(Environment.NewLine, p.Select(ToString));
         }
 
-        private static string ToString(GetAllLightsResponse p)
+        private static string ToString(ICollection<Light> p)
         {
             return string.Join(Environment.NewLine, p.Select(ToString));
         }
@@ -113,9 +114,8 @@ namespace HueSharp.Tests
             return string.Join(Environment.NewLine, p.Select(ToString));
         }
 
-
-        private static string ToString(GetLightStateResponse p)
-            => $"{p.Name}: {(p.Status.IsOn ? "on" : "off")}";
+        private static string ToString(IHueStatusMessage p)
+            => $"{(p.Status.IsOn ? "on" : "off")}";
 
         private static string ToString(SuccessResponse p)
             => string.Join(", ", p.Select(q => $"{q.Key}: {q.Value}"));

@@ -5,10 +5,10 @@ using System.Net.Http;
 
 namespace HueSharp.Messages.Lights
 {
-    public class SetLightStateRequest : HueRequestBase, IUploadable, IHueResponse
+    class SetLightStateRequest : HueRequestBase, IHueStatusMessage, IUploadable, IHueResponse
     {
         public int LightId { get; set; }
-        public SetLightState Status { get; set; }
+        public LightState Status { get; set; }
 
         public SetLightStateRequest(int lightId) : base("lights", HttpMethod.Put)
         {

@@ -9,9 +9,10 @@ namespace HueSharp.Messages
     public class Command : HueRequestBase, IUploadable
     {
         public Command() : base("", HttpMethod.Get) { }
-        public Command(IHueRequest request, Func<IHueRequest, LightState> propertySelector ) : base(request.Address, request.Method)
+        public Command(IHueRequest request) : base(request.Address, request.Method)
         {
-            Body = propertySelector(request);
+            if(!(request is IHueStatusMessage statusRequest)) throw new InvalidOperationException("Request base for a command must implement IHueStatusMessage!");
+            Body = statusRequest.Status;
         }
 
         [JsonProperty(PropertyName = "address")]

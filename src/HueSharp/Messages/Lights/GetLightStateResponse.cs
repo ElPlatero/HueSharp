@@ -2,7 +2,7 @@
 
 namespace HueSharp.Messages.Lights
 {
-    public class GetLightStateResponse : IHueResponse
+    class GetLightStateResponse : IHueResponse, IHueStatusMessage
     {
         [JsonProperty(PropertyName = "state")]
         public LightState Status { get; set; }
