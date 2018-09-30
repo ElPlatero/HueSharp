@@ -15,9 +15,14 @@ namespace HueSharp.Builder
             _isIncrease = isIncrease;
         }
 
-        public IModifyLightStateBuilder By(byte ammount)
+        /// <summary>
+        /// The amount that the current value should be increased or decreased by.
+        /// </summary>
+        /// <param name="amount"></param>
+        /// <returns></returns>
+        public IModifyLightStateBuilder By(ushort amount)
         {
-            _adjustAction(_isIncrease ? ammount : -ammount);
+            _adjustAction(_isIncrease ? amount : -amount);
             return _builder;
         }
     }

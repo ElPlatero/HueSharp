@@ -2,6 +2,6 @@
 {
     public interface ILightStateAdjustmentBuilder
     {
-        IModifyLightStateBuilder By(byte ammount);
+        IModifyLightStateBuilder By(ushort amount);
     }
 }
