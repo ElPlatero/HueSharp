@@ -1,9 +1,10 @@
 ﻿using HueSharp.Messages;
 using HueSharp.Messages.Lights;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using HueSharp.Enums;
+using HueSharp.Builder;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -18,7 +19,7 @@ namespace HueSharp.Tests
         [ExplicitFact]
         public async Task GetLightStateTest()
         {
-            var request = new GetLightStateRequest {LightId = 7};
+            var request = HueRequestBuilder.Select.Light(7).Build();;
 
             var response = await _client.GetResponseAsync(request);
 
@@ -31,30 +32,36 @@ namespace HueSharp.Tests
         [ExplicitFact]
         public async Task SetLightStateTest()
         {
-            IHueRequest request = new GetLightStateRequest(7);
-            var response = await _client.GetResponseAsync(request) as GetLightStateResponse;
-            Assert.NotNull(response);
+            const int LIGHT_ID = 4;
 
-            request = new SetLightStateRequest(7);
-            ((SetLightStateRequest) request).Status.IsOn = !response.Status.IsOn;
-            if (!response.Status.IsOn)
+            IHueRequest request = HueRequestBuilder.Select.Light(LIGHT_ID).Build();
+            var response = await _client.GetResponseAsync(request);
+            Assert.True(response is IHueStatusMessage);
+
+            var builder = HueRequestBuilder.Modify.Light(LIGHT_ID);
+            if (((IHueStatusMessage)response).Status.IsOn) builder.During(TimeSpan.FromSeconds(10)).TurnOff();
+            else
             {
-                ((SetLightStateRequest)request).Status.Hue = new Random().Next(0, ushort.MaxValue);
-                ((SetLightStateRequest) request).Status.Effect = LightEffect.ColorLoop;
+                builder
+                    .TurnOn()
+                    .Color(46920, 254, 254)
+                    .ColorLoop();
             }
 
-            _client.GetResponseAsync(request).Wait();
+            request = builder.Build();
 
-            Assert.True(!((SetLightStateRequest)request).Status.HasUnsavedChanges);
+            response = await _client.GetResponseAsync(request);
+
+            Assert.True(response is IHueStatusMessage);
          }
 
         [ExplicitFact]
         public async Task GetAllLightsTest()
         {
-            IHueRequest request = new GetAllLightsRequest();
+            IHueRequest request = HueRequestBuilder.Select.Lights().Build();
 
             var response = await _client.GetResponseAsync(request);
-            Assert.True(response is GetAllLightsResponse);
+            Assert.True(response is ICollection<Light>);
 
             OnLog(response);
         }
@@ -62,11 +69,15 @@ namespace HueSharp.Tests
         [ExplicitFact]
         public async Task CreateErrorObjectTest()
         {
-            IHueRequest initialRequest = new GetAllLightsRequest();
-            var initialResponse = (GetAllLightsResponse)await _client.GetResponseAsync(initialRequest);
-            var id = initialResponse.First(p => !p.Status.IsOn).Id;
+            IHueRequest initialRequest = HueRequestBuilder.Select.Lights().Build();
+            var initialResponse = await _client.GetResponseAsync(initialRequest);
 
-            var request = new SetLightStateRequest(id) {Status = {BrightnessIncrement = 100}};
+            var lights = initialResponse as ICollection<Light>;
+            Assert.NotNull(lights);
+
+            var id = lights.First(p => !p.Status.IsOn).Id;
+
+            var request = HueRequestBuilder.Modify.Light(id).Increase.Brightness.By(100).Build();
 
             await Assert.ThrowsAsync<HueResponseException>(() => _client.GetResponseAsync(request));
         }

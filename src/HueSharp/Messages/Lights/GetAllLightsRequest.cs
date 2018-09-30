@@ -3,7 +3,7 @@ using System.Net.Http;
 
 namespace HueSharp.Messages.Lights
 {
-    public class GetAllLightsRequest : HueRequestBase
+    class GetAllLightsRequest : HueRequestBase
     {
         public GetAllLightsRequest() : base("lights", HttpMethod.Get) { }
 
