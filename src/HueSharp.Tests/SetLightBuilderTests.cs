@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Drawing;
+using System.Linq;
 using System.Net.Http;
 using HueSharp.Builder;
 using HueSharp.Enums;
@@ -45,7 +47,7 @@ namespace HueSharp.Tests
             Assert.True(statusRequest.Status.ShouldSerializeIsOn());
             Assert.True(statusRequest.Status.IsOn);
 
-            builder.TurnOff(); //TurnOn().TurnOff() => these two void each other, so that nothing is expected to happen.
+            builder.TurnOff(); //TurnOn().TurnOff() => these two void each other, so nothing is expected to happen.
             request = builder.Build();
 
             statusRequest = request as IHueStatusMessage;
@@ -73,7 +75,7 @@ namespace HueSharp.Tests
             Assert.False(statusRequest.Status.IsOn);
 
             builder.TurnOn();
-            request = builder.Build();  //this should negate the TurnOff(), resulting in a result that does not change the status.
+            request = builder.Build();  //this should negate the TurnOff(), resulting in a request that does not change the status.
 
             statusRequest = request as IHueStatusMessage;
             Assert.NotNull(statusRequest);
@@ -437,6 +439,23 @@ namespace HueSharp.Tests
             Assert.NotNull(statusRequest);
             Assert.False(statusRequest.Status.HasUnsavedChanges);
             Assert.False(((SetLightState)statusRequest.Status).ShouldSerializeBrightnessIncrement());
+        }
+
+        [Fact]
+        public void SetRgbColorTest()
+        {
+            var builder = HueRequestBuilder.Modify.Light(7).Color(Color.Red);
+            var request = builder.Build();
+
+            var statusRequest = request as IHueStatusMessage;
+            Assert.NotNull(statusRequest);
+            Assert.True(statusRequest.Status.HasUnsavedChanges);
+            Assert.True(statusRequest.Status.ShouldSerializeCoordinates());
+            Assert.NotEmpty(statusRequest.Status.Coordinates);
+            Assert.Collection(statusRequest.Status.Coordinates, 
+                p => Assert.True(p >= 0 && p <= 1),
+                p => Assert.True(p >= 0 && p <= 1)
+            );
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 
 namespace HueSharp.Builder
 {
@@ -23,7 +24,7 @@ namespace HueSharp.Builder
         /// <param name="saturation">The saturation as a number between 1 and 254.</param>
         IModifyLightStateBuilder Saturation(byte saturation);
         /// <summary>
-        /// Sets the brightness of the light. Resets and changes to color temperature, alerts and/or CIE coordinates that may have been made before.
+        /// Sets the brightness of the light. Resets and changes to color temperature and alerts that may have been made before.
         /// </summary>
         /// <param name="brightness">The brightness as a number between 1 and 254.</param>
         IModifyLightStateBuilder Brightness(byte brightness);
@@ -35,9 +36,13 @@ namespace HueSharp.Builder
         /// <param name="brightness">The brightness as a number between 1 and 254.</param>
         IModifyLightStateBuilder Color(ushort hue, byte saturation, byte brightness);
         /// <summary>
+        /// Sets the color of the light from a RGB-representation. Resets and changes to color temperature, alerts and/or CIE coordinates that may have been made before.
+        /// </summary>
+        IModifyLightStateBuilder Color(Color color);
+        /// <summary>
         /// Sets the position of the currently displayed light color to the given coordinates in CIE space.
         /// If the gamut of the bulb does not support the given location, the light will switch to the closest point in CIE space it can display.
-        /// Resets and changes to color temperature, alerts, brightness, hue, and/or saturation that may have been made before.
+        /// Resets and changes to color temperature, alerts, hue, and/or saturation that may have been made before.
         /// </summary>
         /// <param name="xCoordinate">A number between 0 and 1.</param>
         /// <param name="yCoordinate">A number between 0 and 1.</param>

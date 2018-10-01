@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using HueSharp.Enums;
 using HueSharp.Messages;
@@ -60,12 +61,11 @@ namespace HueSharp.Builder
             return this;
         }
         /// <summary>
-        /// Sets the brightness of the light. Resets and changes to color temperature, alerts and/or CIE coordinates that may have been made before.
+        /// Sets the brightness of the light. Resets and changes to color temperature and/or alerts that may have been made before.
         /// </summary>
         /// <param name="brightness">The brightness as a number between 1 and 254.</param>
         public IModifyLightStateBuilder Brightness(byte brightness)
         {
-            _coordinates =  null;
             _colorTemperature = null;
             _alert = null;
             return Modify(ref _bri, brightness);
@@ -99,16 +99,40 @@ namespace HueSharp.Builder
         /// <param name="saturation">The saturation as a number between 1 and 254.</param>
         /// <param name="brightness">The brightness as a number between 1 and 254.</param>
         public IModifyLightStateBuilder Color(ushort hue, byte saturation, byte brightness) => Hue(hue).Saturation(saturation).Brightness(brightness);
+
+        public IModifyLightStateBuilder Color(Color color)
+        {
+            color = System.Drawing.Color.FromArgb(255, color.R, color.B, color.G);
+
+            // Normalize.
+            var red = (float)color.R / 255;
+            var green = (float)color.G / 255;
+            var blue = (float)color.B / 255;
+
+            // Apply gamma correction.
+            red = red > 0.04045f ? (float)Math.Pow((red + 0.055f) / (1.0f + 0.055f), 2.4f) : red / 12.92f;
+            green = green > 0.04045f ? (float)Math.Pow((green + 0.055f) / (1.0f + 0.055f), 2.4f) : green / 12.92f;
+            blue = blue > 0.04045f ? (float)Math.Pow((blue + 0.055f) / (1.0f + 0.055f), 2.4f) : blue / 12.92f;
+
+            // Convert to xyz (RGB D65 formula, wikipedia.)
+            var x = red * 0.649926f + green * 0.103455f + blue * 0.197109f;
+            var y = red * 0.234327f + green * 0.743075f + blue * 0.022598f;
+            var z = red * 0.0000000f + green * 0.053077f + blue * 1.035763f;
+
+            return CieLocation(x / (x + y + z), y / (x + y + z)).Brightness((byte)(y * byte.MaxValue));
+        }
+
+
         /// <summary>
         /// Sets the position of the currently displayed light color to the given coordinates in CIE space.
         /// If the gamut of the bulb does not support the given location, the light will switch to the closest point in CIE space it can display.
-        /// Resets and changes to color temperature, alerts, brightness, hue, and/or saturation that may have been made before.
+        /// Resets and changes to color temperature, alerts, hue, and/or saturation that may have been made before.
         /// </summary>
         /// <param name="xCoordinate">A number between 0 and 1.</param>
         /// <param name="yCoordinate">A number between 0 and 1.</param>
         public IModifyLightStateBuilder CieLocation(double xCoordinate, double yCoordinate)
         {
-            _hue = _hueInc = _bri = _briInc = _sat = _satInc = _colorTemperature = null;
+            _hue = _hueInc = _sat = _satInc = _colorTemperature = null;
             _alert = null;
             return Modify(ref _coordinates, new HashSet<double>(new[] {xCoordinate, yCoordinate}));
         }
