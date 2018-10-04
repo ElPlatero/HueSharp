@@ -3,7 +3,7 @@ using HueSharp.Messages.Lights;
 
 namespace HueSharp.Builder
 {
-    public class GetAllLightsRequestBuilder : IBuilder
+    class GetAllLightsRequestBuilder : IBuilder
     {
         public IHueRequest Build()
         {

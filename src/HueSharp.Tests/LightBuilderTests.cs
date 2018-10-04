@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Drawing;
-using System.Linq;
 using System.Net.Http;
 using HueSharp.Builder;
 using HueSharp.Enums;
@@ -11,16 +10,16 @@ using Xunit.Abstractions;
 
 namespace HueSharp.Tests
 {
-    public class SetLightBuilderTests : TestBase
+    public class LightBuilderTests : TestBase
     {
-        public SetLightBuilderTests(ITestOutputHelper outputHelper) : base(outputHelper)
+        public LightBuilderTests(ITestOutputHelper outputHelper) : base(outputHelper)
         {
         }
 
         [Fact]
         public void BuildGetAllLightsRequest()
         {
-            var request = HueRequestBuilder.Select.Lights().Build();
+            var request = HueRequestBuilder.Select.Lights.Build();
             Assert.Equal("lights", request.Address);
             Assert.Equal(HttpMethod.Get, request.Method);
         }
@@ -35,9 +34,17 @@ namespace HueSharp.Tests
         }
 
         [Fact]
+        public void SetNameTest()
+        {
+            var request = HueRequestBuilder.Modify.Light(7).Attributes.Name("NewName").Build();
+
+            
+        }
+
+        [Fact]
         public void BuildTurnOnOffRequestTest()
         {
-            var builder = HueRequestBuilder.Modify.Light(7).TurnOn();
+            var builder = HueRequestBuilder.Modify.Light(7).Status.TurnOn();
 
             var request = builder.Build();
 
@@ -107,7 +114,7 @@ namespace HueSharp.Tests
         [Fact]
         public void HueTest()
         {
-            var builder = HueRequestBuilder.Modify.Light(7).Hue(49960);
+            var builder = HueRequestBuilder.Modify.Light(7).Status.Hue(49960);
             var request = builder.Build();
 
             Assert.Equal("lights/7/state", request.Address);
@@ -144,7 +151,7 @@ namespace HueSharp.Tests
         [Fact]
         public void SaturationTest()
         {
-            var builder = HueRequestBuilder.Modify.Light(7).Saturation(254);
+            var builder = HueRequestBuilder.Modify.Light(7).Status.Saturation(254);
             var request = builder.Build();
 
             Assert.Equal("lights/7/state", request.Address);
@@ -181,7 +188,7 @@ namespace HueSharp.Tests
         [Fact]
         public void BrightnessTest()
         {
-            var builder = HueRequestBuilder.Modify.Light(7).Brightness(254);
+            var builder = HueRequestBuilder.Modify.Light(7).Status.Brightness(254);
             var request = builder.Build();
 
             Assert.Equal("lights/7/state", request.Address);
@@ -219,7 +226,7 @@ namespace HueSharp.Tests
         [Fact]
         public void ColorHsbTest()
         {
-            var builder = HueRequestBuilder.Modify.Light(7).Color(40000, 100, 128);
+            var builder = HueRequestBuilder.Modify.Light(7).Status.Color(40000, 100, 128);
             var request = builder.Build();
 
             Assert.Equal("lights/7/state", request.Address);
@@ -238,7 +245,7 @@ namespace HueSharp.Tests
         [Fact]
         public void CieLocationTest()
         {
-            var builder = HueRequestBuilder.Modify.Light(7).CieLocation(0.3, 0.7);
+            var builder = HueRequestBuilder.Modify.Light(7).Status.CieLocation(0.3, 0.7);
             var request = builder.Build();
 
             Assert.Equal("lights/7/state", request.Address);
@@ -254,7 +261,7 @@ namespace HueSharp.Tests
         [Fact]
         public void ColorTemperatureTest()
         {
-            var builder = HueRequestBuilder.Modify.Light(7).ColorTemperature(4500);
+            var builder = HueRequestBuilder.Modify.Light(7).Status.ColorTemperature(4500);
             var request = builder.Build();
 
             Assert.Equal("lights/7/state", request.Address);
@@ -269,7 +276,7 @@ namespace HueSharp.Tests
         [Fact]
         public void TransitionTimeTest()
         {
-            var builder = HueRequestBuilder.Modify.Light(7).During(TimeSpan.FromSeconds(10));
+            var builder = HueRequestBuilder.Modify.Light(7).Status.During(TimeSpan.FromSeconds(10));
             var request = builder.Build();
 
             Assert.Equal("lights/7/state", request.Address);
@@ -292,7 +299,7 @@ namespace HueSharp.Tests
         [Fact]
         public void ColorLoopTest()
         {
-            var builder = HueRequestBuilder.Modify.Light(7).ColorLoop();
+            var builder = HueRequestBuilder.Modify.Light(7).Status.ColorLoop();
             var request = builder.Build();
 
             Assert.Equal("lights/7/state", request.Address);
@@ -307,7 +314,7 @@ namespace HueSharp.Tests
         [Fact]
         public void AlertTest()
         {
-            var builder = HueRequestBuilder.Modify.Light(7).Alert("<fzwehf");
+            var builder = HueRequestBuilder.Modify.Light(7).Status.Alert("<fzwehf");
             var request = builder.Build();
 
             Assert.Equal("lights/7/state", request.Address);
@@ -332,7 +339,7 @@ namespace HueSharp.Tests
         [Fact]
         public void IncreaseDecreaseHueTest()
         {
-            var builder = HueRequestBuilder.Modify.Light(7).Increase.Hue.By(65535);
+            var builder = HueRequestBuilder.Modify.Light(7).Status.Increase.Hue.By(65535);
             var request = builder.Build();
 
             var statusRequest = request as IHueStatusMessage;
@@ -369,7 +376,7 @@ namespace HueSharp.Tests
         [Fact]
         public void IncreaseDecreaseSaturationTest()
         {
-            var builder = HueRequestBuilder.Modify.Light(7).Increase.Saturation.By(1000);
+            var builder = HueRequestBuilder.Modify.Light(7).Status.Increase.Saturation.By(1000);
             var request = builder.Build();
 
             var statusRequest = request as IHueStatusMessage;
@@ -406,7 +413,7 @@ namespace HueSharp.Tests
         [Fact]
         public void IncreaseDecreaseBrightnessTest()
         {
-            var builder = HueRequestBuilder.Modify.Light(7).Increase.Brightness.By(1000);
+            var builder = HueRequestBuilder.Modify.Light(7).Status.Increase.Brightness.By(1000);
             var request = builder.Build();
 
             var statusRequest = request as IHueStatusMessage;
@@ -444,7 +451,7 @@ namespace HueSharp.Tests
         [Fact]
         public void SetRgbColorTest()
         {
-            var builder = HueRequestBuilder.Modify.Light(7).Color(Color.Red);
+            var builder = HueRequestBuilder.Modify.Light(7).Status.Color(Color.Red);
             var request = builder.Build();
 
             var statusRequest = request as IHueStatusMessage;

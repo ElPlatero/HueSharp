@@ -8,7 +8,7 @@ using System.Net.Http;
 
 namespace HueSharp.Messages.Groups
 {
-    public class CreateGroupRequest : SetGroupRequest
+    class CreateGroupRequest : SetGroupRequest
     {
         [JsonProperty(PropertyName = "type"), JsonConverter(typeof(StringEnumConverter))]
         public GroupType Type { get; set; }

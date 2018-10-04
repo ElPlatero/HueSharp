@@ -1,11 +1,11 @@
 ﻿using HueSharp.Converters;
 using Newtonsoft.Json;
-using System;
 using System.Net.Http;
+using HueSharp.Messages.Lights;
 
 namespace HueSharp.Messages.Groups
 {
-    public class SetGroupStateRequest : HueRequestBase, IUploadable
+    public class SetGroupStateRequest : HueRequestBase, IHueStatusMessage, IUploadable
     {
         public int GroupId { get; set; }
         public SetGroupState NewState { get; set; }
@@ -29,5 +29,13 @@ namespace HueSharp.Messages.Groups
             return JsonConvert.DeserializeObject<SuccessResponse>(json, new SuccessResponseConverter(Address));
         }
 
+        public LightState Status
+        {
+            get => NewState;
+            set
+            {
+                if (value is SetGroupState setGroupState) NewState = setGroupState;
+            }
+        }
     }
 }

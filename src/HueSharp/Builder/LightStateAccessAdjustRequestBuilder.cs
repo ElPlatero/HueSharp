@@ -1,6 +1,6 @@
 ﻿namespace HueSharp.Builder
 {
-    public class LightStateAccessAdjustRequestBuilder
+    class LightStateAccessAdjustRequestBuilder : ILightStateAccessAdjustRequestBuilder
     {
         public LightStateAccessAdjustRequestBuilder(SetLightStateAdjustmentRequestBuilder hue, SetLightStateAdjustmentRequestBuilder saturation, SetLightStateAdjustmentRequestBuilder brightness)
         {
@@ -12,14 +12,14 @@
         /// <summary>
         /// Increment or decrement the current hue.
         /// </summary>
-        public SetLightStateAdjustmentRequestBuilder Hue { get; }
+        public ILightStateAdjustmentBuilder Hue { get; }
         /// <summary>
         /// Increment or decrement the current saturation.
         /// </summary>
-        public SetLightStateAdjustmentRequestBuilder Saturation { get; }
+        public ILightStateAdjustmentBuilder Saturation { get; }
         /// <summary>
         /// Increment or decrement the current brightness.
         /// </summary>
-        public SetLightStateAdjustmentRequestBuilder Brightness { get; }
+        public ILightStateAdjustmentBuilder Brightness { get; }
     }
 }

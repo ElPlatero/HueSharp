@@ -176,7 +176,7 @@ namespace HueSharp.Builder
         /// <summary>
         /// Allows increment of some basic color values instead of supplying absolute values.
         /// </summary>
-        public LightStateAccessAdjustRequestBuilder Increase
+        public ILightStateAccessAdjustRequestBuilder Increase
         {
             get
             {
@@ -217,7 +217,7 @@ namespace HueSharp.Builder
         /// <summary>
         /// Allows decrement of some basic color values instead of supplying absolute values.
         /// </summary>
-        public LightStateAccessAdjustRequestBuilder Decrease
+        public ILightStateAccessAdjustRequestBuilder Decrease
         {
             get
             {

@@ -4,7 +4,7 @@ using System.Net.Http;
 
 namespace HueSharp.Messages.Groups
 {
-    public class GetGroupRequest : HueRequestBase
+    class GetGroupRequest : HueRequestBase
     {
         public int GroupId { get; set; }
 

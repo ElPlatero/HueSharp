@@ -1,6 +1,5 @@
 ﻿using HueSharp.Enums;
 using HueSharp.Messages;
-using HueSharp.Messages.Lights;
 using HueSharp.Messages.Schedules;
 using System;
 using System.Threading.Tasks;
@@ -29,7 +28,7 @@ namespace HueSharp.Tests
         public async Task CreateScheduleTest()
         {
 
-            var commandState = HueRequestBuilder.Modify.Light(7).TurnOn().Build();
+            var commandState = HueRequestBuilder.Modify.Light(7).Status.TurnOn().Build();
             var newSchedule = new GetScheduleResponse
             {
                 AutoDelete = true,
@@ -102,7 +101,7 @@ namespace HueSharp.Tests
         private async Task<int> CreateTemporarySchedule()
         {
             var request = new CreateScheduleRequest();
-            var commandState = HueRequestBuilder.Modify.Light(7).TurnOn().Build();
+            var commandState = HueRequestBuilder.Modify.Light(7).Status.TurnOn().Build();
             var newSchedule = new GetScheduleResponse
             {
                 AutoDelete = true,

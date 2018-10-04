@@ -7,7 +7,7 @@ using System.Net.Http;
 
 namespace HueSharp.Messages.Groups
 {
-    public class SetGroupRequest : HueRequestBase, IUploadable
+    class SetGroupRequest : HueRequestBase, IUploadable
     {
         [JsonIgnore]
         public int GroupId { get; set; }
@@ -29,7 +29,7 @@ namespace HueSharp.Messages.Groups
         public SetGroupRequest(int groupId, IEnumerable<int> lightIds, RoomClass roomClass) : base("groups", HttpMethod.Put)
         {
             GroupId = groupId;
-            Lights = new List<int>(lightIds);
+            Lights = lightIds != null ? lightIds.ToList() : new List<int>();
             Class = roomClass;
         }
 

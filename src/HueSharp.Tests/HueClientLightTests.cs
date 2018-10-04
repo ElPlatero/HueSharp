@@ -19,7 +19,7 @@ namespace HueSharp.Tests
         [ExplicitFact]
         public async Task GetLightStateTest()
         {
-            var request = HueRequestBuilder.Select.Light(7).Build();;
+            var request = HueRequestBuilder.Select.Light(7).Build();
 
             var response = await _client.GetResponseAsync(request);
 
@@ -39,16 +39,16 @@ namespace HueSharp.Tests
             Assert.True(response is IHueStatusMessage);
 
             var builder = HueRequestBuilder.Modify.Light(LIGHT_ID);
-            if (((IHueStatusMessage)response).Status.IsOn) builder.During(TimeSpan.FromSeconds(10)).TurnOff();
+            if (((IHueStatusMessage)response).Status.IsOn) builder.Status.During(TimeSpan.FromSeconds(10)).TurnOff();
             else
             {
-                builder
+                builder.Status
                     .TurnOn()
                     .Color(46920, 254, 254)
                     .ColorLoop();
             }
 
-            request = builder.Build();
+            request = builder.Status.Build();
 
             response = await _client.GetResponseAsync(request);
 
@@ -58,7 +58,7 @@ namespace HueSharp.Tests
         [ExplicitFact]
         public async Task GetAllLightsTest()
         {
-            IHueRequest request = HueRequestBuilder.Select.Lights().Build();
+            IHueRequest request = HueRequestBuilder.Select.Lights.Build();
 
             var response = await _client.GetResponseAsync(request);
             Assert.True(response is ICollection<Light>);
@@ -69,7 +69,7 @@ namespace HueSharp.Tests
         [ExplicitFact]
         public async Task CreateErrorObjectTest()
         {
-            IHueRequest initialRequest = HueRequestBuilder.Select.Lights().Build();
+            IHueRequest initialRequest = HueRequestBuilder.Select.Lights.Build();
             var initialResponse = await _client.GetResponseAsync(initialRequest);
 
             var lights = initialResponse as ICollection<Light>;
@@ -77,7 +77,7 @@ namespace HueSharp.Tests
 
             var id = lights.First(p => !p.Status.IsOn).Id;
 
-            var request = HueRequestBuilder.Modify.Light(id).Increase.Brightness.By(100).Build();
+            var request = HueRequestBuilder.Modify.Light(id).Status.Increase.Brightness.By(100).Build();
 
             await Assert.ThrowsAsync<HueResponseException>(() => _client.GetResponseAsync(request));
         }

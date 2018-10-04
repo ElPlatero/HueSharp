@@ -60,11 +60,11 @@ namespace HueSharp.Builder
         /// <summary>
         /// Allows increment of some basic color values instead of supplying absolute values.
         /// </summary>
-        LightStateAccessAdjustRequestBuilder Increase { get; }
+        ILightStateAccessAdjustRequestBuilder Increase { get; }
         /// <summary>
         /// Allows decrement of some basic color values instead of supplying absolute values.
         /// </summary>
-        LightStateAccessAdjustRequestBuilder Decrease { get; }
+        ILightStateAccessAdjustRequestBuilder Decrease { get; }
         /// <summary>
         /// Sets the transition time for the chosen modifications to the light. If no other modifications have been made, the request will be empty.
         /// </summary>

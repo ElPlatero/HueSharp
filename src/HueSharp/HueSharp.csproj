@@ -12,6 +12,7 @@
     <RepositoryUrl>https://github.com/ElPlatero/HueSharp</RepositoryUrl>
     <PackageTags>Hue</PackageTags>
     <PackageReleaseNotes>breaking change: client GetResponse is now GetResponseAsync. Synchronous methods have been scrapped.</PackageReleaseNotes>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

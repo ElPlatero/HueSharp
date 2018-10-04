@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace HueSharp.Messages.Groups
 {
-    public class GetGroupResponse : IHueResponse
+    public class GetGroupResponse : IHueResponse, IHueStatusMessage
     {
         public int Id { get; set; }
         [JsonProperty(PropertyName = "name")]
@@ -21,5 +21,11 @@ namespace HueSharp.Messages.Groups
         public bool IsRecycle { get; set; }
         [JsonProperty(PropertyName = "action")]
         public LightState Action { get; set; }
+        [JsonIgnore]
+        public LightState Status
+        {
+            get => Action;
+            set => Action = value;
+        }
     }
 }

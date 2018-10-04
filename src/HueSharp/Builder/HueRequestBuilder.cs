@@ -2,7 +2,8 @@
 {
     public static class HueRequestBuilder
     {
-        public static GetRequestBuilder Select => new GetRequestBuilder();
-        public static SetRequestBuilder Modify => new SetRequestBuilder();
+        public static IGetRequestBuilder Select => new GetRequestBuilder();
+        public static ISetRequestBuilder Modify => new SetRequestBuilder();
+        public static ICreateRequestBuilder Create => new CreateRequestBuilder();
     }
 }

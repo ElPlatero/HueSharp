@@ -10,6 +10,8 @@ using HueSharp.Messages.Schedules;
 using HueSharp.Messages.Sensors;
 using HueSharp.Net;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
+using Xunit;
 using Xunit.Abstractions;
 
 namespace HueSharp.Tests
@@ -63,7 +65,21 @@ namespace HueSharp.Tests
             }
         }
 
+        protected void AssertRequestBody(IHueRequest request, params (string propertyName, string value)[] checks)
+        {
+            var uploadable = request as IUploadable;
+            Assert.NotNull(uploadable);
 
+            var jObject = JObject.Parse(uploadable.GetRequestBody());
+
+            foreach (var check in checks)
+            {
+                Assert.NotNull(jObject[check.propertyName]);
+                Assert.Equal(check.value, jObject[check.propertyName].Value<string>());
+            }
+        }
+
+        #region static
         private static string ToString(GetAllGroupsResponse p)
         {
             return string.Join(Environment.NewLine, p.Select(ToString));
@@ -119,7 +135,7 @@ namespace HueSharp.Tests
 
         private static string ToString(SuccessResponse p)
             => string.Join(", ", p.Select(q => $"{q.Key}: {q.Value}"));
-
+        #endregion
 
     }
 }

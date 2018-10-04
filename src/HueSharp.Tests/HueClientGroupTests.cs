@@ -2,6 +2,8 @@
 using HueSharp.Messages.Groups;
 using System;
 using System.Threading.Tasks;
+using HueSharp.Builder;
+using HueSharp.Enums;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -27,7 +29,7 @@ namespace HueSharp.Tests
         [ExplicitFact]
         public async Task GetGroupTest()
         {
-            var request = new GetGroupRequest(3);
+            var request = HueRequestBuilder.Select.Group(3).Build();
 
             var response = await _client.GetResponseAsync(request);
             Assert.True(response is GetGroupResponse);
@@ -38,13 +40,12 @@ namespace HueSharp.Tests
         [ExplicitFact]
         public async Task SetGroupTest()
         {
-            IHueRequest request = new GetGroupRequest(1);
+            IHueRequest request = HueRequestBuilder.Select.Group(1).Build();
             IHueResponse response = await _client.GetResponseAsync(request);
 
             OnLog(response);
 
-            request = new SetGroupRequest((GetGroupResponse)response);
-            ((SetGroupRequest)request).NewName = "Testname";
+            request = HueRequestBuilder.Modify.Group(response).Attributes.UseLightsInResponse().Name("Testname").Build();
 
             response = await _client.GetResponseAsync(request);
             Assert.True(response is SuccessResponse);
@@ -66,7 +67,7 @@ namespace HueSharp.Tests
         [ExplicitFact]
         public async Task CreateAndDeleteGroupTest()
         {
-            IHueRequest request = new CreateGroupRequest("tmp testgroup", 6, 7);
+            IHueRequest request = HueRequestBuilder.Create.Group.New(6, 7).Name("tmp testgroup").Class(GroupType.Room).Build();
 
             IHueResponse response = await _client.GetResponseAsync(request);
             Assert.True(response is SuccessResponse);
