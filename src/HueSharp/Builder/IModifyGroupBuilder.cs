@@ -7,7 +7,7 @@ namespace HueSharp.Builder
     public interface IModifyGroupBuilder
     {
         IModifyGroupAttributeEntryBuilder Attributes { get; }
-        IModifyGroupStatusBuilder Status { get; }
+        IModifyGroupStateBuilder Status { get; }
     }
 
     class ModifyGroupBuilder : IModifyGroupBuilder
@@ -31,6 +31,6 @@ namespace HueSharp.Builder
         }
 
         public IModifyGroupAttributeEntryBuilder Attributes => _attributeEntryBuilder ?? new ModifyGroupAttributeEntryBuilder(_groupId);
-        public IModifyGroupStatusBuilder Status => new ModifyGroupStatusBuilder(_groupId);
+        public IModifyGroupStateBuilder Status => new ModifyGroupStateBuilder(_groupId);
     }
 }

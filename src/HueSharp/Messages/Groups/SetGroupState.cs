@@ -8,7 +8,12 @@ namespace HueSharp.Messages.Groups
         private string _scene;
 
         [JsonProperty(PropertyName = "scene")]
-        public string Scene { get { return _scene; } set { SetValue(ref _scene, value); } }
+        public string Scene
+        {
+            get => _scene;
+            set => SetValue(ref _scene, value);
+        }
+
         public bool ShouldSerializeScene() => ShouldSerialize(nameof(Scene));
     }
 }
