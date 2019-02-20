@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using HueSharp.Messages;
 using HueSharp.Messages.Groups;
 
 namespace HueSharp.Builder

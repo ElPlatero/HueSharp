@@ -10,7 +10,7 @@ namespace HueSharp
         {
             var fieldInfo = value.GetType().GetField(value.ToString());
             var attributes = (DescriptionAttribute[])fieldInfo.GetCustomAttributes(typeof(DescriptionAttribute), false);
-            return attributes != null && attributes.Length > 0 ? attributes[0].Description : value.ToString();
+            return attributes.Length > 0 ? attributes[0].Description : value.ToString();
         }
 
         public static Enum ToEnum(this string value, Type enumType)

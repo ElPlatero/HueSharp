@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using HueSharp.Converters;
-using HueSharp.Messages.Lights;
 using System.Linq;
 
 namespace HueSharp.Messages.Scenes

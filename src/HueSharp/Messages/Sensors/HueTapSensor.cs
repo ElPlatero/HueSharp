@@ -34,8 +34,8 @@ namespace HueSharp.Messages.Sensors
         [JsonIgnore]
         public HueButtonState ButtonState
         {
-            get { return (HueButtonState)_buttonState; }
-            set { _buttonState = (int)value; }
+            get => (HueButtonState)_buttonState;
+            set => _buttonState = (int)value;
         }
 
         [JsonProperty(PropertyName = "buttonevent")]

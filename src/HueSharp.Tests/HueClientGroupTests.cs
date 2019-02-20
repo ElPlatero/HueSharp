@@ -18,7 +18,7 @@ namespace HueSharp.Tests
         [ExplicitFact]
         public async Task GetAllGroupsTest()
         {
-            var request = new GetAllGroupsRequest();
+            var request = HueRequestBuilder.Select.Groups.Build();
 
             var response = await _client.GetResponseAsync(request);
             Assert.True(response is GetAllGroupsResponse);
@@ -56,7 +56,7 @@ namespace HueSharp.Tests
         [ExplicitFact]
         public async Task SetGroupStateTest()
         {
-            IHueRequest request = new SetGroupStateRequest(3, new SetGroupState { IsOn = false });
+            IHueRequest request = HueRequestBuilder.Modify.Group(3).Status.TurnOff().Build();
 
             IHueResponse response = await _client.GetResponseAsync(request);
 

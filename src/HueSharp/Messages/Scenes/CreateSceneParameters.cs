@@ -33,8 +33,8 @@ namespace HueSharp.Messages.Scenes
         [JsonProperty(PropertyName = "transitiontime")]
         private UInt16 TransitionTimeAsNumber
         {
-            get { return Convert.ToUInt16(TransitionTime.TotalSeconds * 10); }
-            set { TransitionTime = TimeSpan.FromSeconds(Convert.ToInt32(value / 10)); }
+            get => Convert.ToUInt16(TransitionTime.TotalSeconds * 10);
+            set => TransitionTime = TimeSpan.FromSeconds(Convert.ToInt32(value / 10));
         }
         public bool ShouldSerializeTransitionTimeAsNumber() => TransitionTime.TotalSeconds > 0;
     }

@@ -8,7 +8,7 @@ namespace HueSharp.Converters
 {
     class SuccessResponseConverter : JsonConverter
     {
-        private string _address;
+        private readonly string _address;
 
         public SuccessResponseConverter(string address)
         {
@@ -42,7 +42,7 @@ namespace HueSharp.Converters
                         reader.Value.ToString().Trim('/');
                     reader.Read();
 
-                    object objectValue = null;
+                    object objectValue;
                     if (reader.TokenType == JsonToken.StartArray)
                     {
                         var objectList = new List<object>();

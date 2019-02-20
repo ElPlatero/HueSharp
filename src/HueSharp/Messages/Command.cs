@@ -1,5 +1,4 @@
-﻿using HueSharp.Converters;
-using HueSharp.Messages.Lights;
+﻿using HueSharp.Messages.Lights;
 using Newtonsoft.Json;
 using System;
 using System.Net.Http;
@@ -21,14 +20,8 @@ namespace HueSharp.Messages
         [JsonProperty(PropertyName = "method")]
         public string HttpVerb
         {
-            get
-            {
-                return Method.ToString().ToUpper();
-            }
-            set
-            {
-                Method = new HttpMethod(value);
-            }
+            get => Method.ToString().ToUpper();
+            set => Method = new HttpMethod(value);
         }
 
         [JsonProperty(PropertyName = "body")]

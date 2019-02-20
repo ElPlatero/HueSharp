@@ -1,5 +1,4 @@
-﻿using HueSharp.Converters;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Net.Http;
 
 namespace HueSharp.Messages.Lights

@@ -43,7 +43,7 @@ namespace HueSharp.Messages.Sensors
         [JsonProperty(PropertyName = "config")]
         public object Configuration { get; set; }
 
-        public virtual JObject GetJObject()
+        public JObject GetJObject()
         {
             return JObject.FromObject(this, new JsonSerializer());
         }

@@ -21,7 +21,7 @@ namespace HueSharp.Tests
         private const string DEV_USER = "hRls7hTDQwox8oCu0GT-rDlY2rdzo7BWgDfmBzh4";
         private const string DEV_ADDRESS = @"http://192.168.178.46/";
 
-        protected HueClient _client;
+        protected readonly HueClient _client;
         private readonly ILogger _logger;
 
         protected TestBase(ITestOutputHelper outputHelper)

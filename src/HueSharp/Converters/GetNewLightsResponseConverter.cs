@@ -26,8 +26,7 @@ namespace HueSharp.Converters
                 }
                 else if(reader.TokenType == JsonToken.PropertyName)
                 {
-                    var newBasicLight = new BasicLight();
-                    newBasicLight.Id = Convert.ToInt32(reader.Value);
+                    var newBasicLight = new BasicLight {Id = Convert.ToInt32(reader.Value)};
                     reader.Read();
                     newBasicLight.Name = reader.Value.ToString();
                     result.Add(newBasicLight);

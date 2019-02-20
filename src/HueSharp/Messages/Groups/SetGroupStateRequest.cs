@@ -5,7 +5,7 @@ using HueSharp.Messages.Lights;
 
 namespace HueSharp.Messages.Groups
 {
-    public class SetGroupStateRequest : HueRequestBase, IHueStatusMessage, IUploadable
+    class SetGroupStateRequest : HueRequestBase, IHueStatusMessage, IUploadable
     {
         public int GroupId { get; set; }
         public SetGroupState NewState { get; set; }

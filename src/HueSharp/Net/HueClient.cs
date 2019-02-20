@@ -16,10 +16,9 @@ namespace HueSharp.Net
         public Uri BaseAddress { get; set; }
         public string User { get; }
 
-        public HueClient(ILoggerFactory loggerFactory, string user) : this(loggerFactory, user, (Uri)null) { }
         public HueClient(ILoggerFactory loggerFactory, string user, string address) : this(loggerFactory, user, new Uri(address)) { }
         public HueClient(ILoggerFactory loggerFactory, string user, IPAddress address) : this(loggerFactory, user, new Uri($"http://{address}")) { }
-        public HueClient(ILoggerFactory loggerFactory, string user, Uri baseAddress)
+        public HueClient(ILoggerFactory loggerFactory, string user, Uri baseAddress = (Uri)null)
         {
             _logger = loggerFactory == null ? new NullLogger<HueClient>() : loggerFactory.CreateLogger<HueClient>();
             LogTrace("Hue client created.");

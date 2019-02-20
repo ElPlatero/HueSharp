@@ -1,10 +1,6 @@
 ﻿using HueSharp.Messages.Sensors;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HueSharp.Converters
 {
@@ -30,8 +26,7 @@ namespace HueSharp.Converters
                 }
                 else if (reader.TokenType == JsonToken.PropertyName)
                 {
-                    var newBasicSensor = new BasicSensor();
-                    newBasicSensor.Id = Convert.ToInt32(reader.Value);
+                    var newBasicSensor = new BasicSensor {Id = Convert.ToInt32(reader.Value)};
                     reader.Read();
                     newBasicSensor.Name = reader.Value.ToString();
                     result.Add(newBasicSensor);

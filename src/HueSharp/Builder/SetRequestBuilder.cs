@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using HueSharp.Messages;
-using HueSharp.Messages.Groups;
+﻿using HueSharp.Messages;
 
 namespace HueSharp.Builder
 {

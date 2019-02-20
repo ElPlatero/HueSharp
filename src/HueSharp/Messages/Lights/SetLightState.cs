@@ -14,10 +14,10 @@ namespace HueSharp.Messages.Lights
         [JsonProperty(PropertyName = "bri_inc")]
         public short BrightnessIncrement
         {
-            get { return _incBrightness; }
+            get => _incBrightness;
             set
             {
-                if (value < -254 || value > 255) throw new ArgumentOutOfRangeException($"Brightness increments must not be less than -254 or greater than 255.");
+                if (value < -254 || value > 255) throw new ArgumentOutOfRangeException(nameof(value), "Brightness increments must not be less than -254 or greater than 255.");
                 SetValue(ref _incBrightness, value);
             }
         }
@@ -26,10 +26,10 @@ namespace HueSharp.Messages.Lights
         [JsonProperty(PropertyName = "sat_inc")]
         public short SaturationIncrement
         {
-            get { return _incSaturation; }
+            get => _incSaturation;
             set
             {
-                if (value < -254 || value > 255) throw new ArgumentOutOfRangeException($"Saturation increments must not be less than -254 or greater than 255.");
+                if (value < -254 || value > 255) throw new ArgumentOutOfRangeException(nameof(value), "Saturation increments must not be less than -254 or greater than 255.");
                 SetValue(ref _incSaturation, value);
             }
         }
@@ -38,10 +38,10 @@ namespace HueSharp.Messages.Lights
         [JsonProperty(PropertyName = "hue_inc")]
         public int HueIncrement
         {
-            get { return _incHue; }
+            get => _incHue;
             set
             {
-                if (value < -65534 || value > 65535) throw new ArgumentOutOfRangeException($"Hue increments must not be less than -65534 or greater than 65535.");
+                if (value < -65534 || value > 65535) throw new ArgumentOutOfRangeException(nameof(value), "Hue increments must not be less than -65534 or greater than 65535.");
                 SetValue(ref _incHue, value);
             }
         }
@@ -50,10 +50,10 @@ namespace HueSharp.Messages.Lights
         [JsonProperty(PropertyName = "ct_inc")]
         public int ColorTemperatureIncrement
         {
-            get { return _incColorTemperature; }
+            get => _incColorTemperature;
             set
             {
-                if (value < -65534 || value > 65535) throw new ArgumentOutOfRangeException($"Color temperature increments must not be less than -65534 or greater than 65535.");
+                if (value < -65534 || value > 65535) throw new ArgumentOutOfRangeException(nameof(value), "Color temperature increments must not be less than -65534 or greater than 65535.");
                 SetValue(ref _incColorTemperature, value);
             }
         }
@@ -62,12 +62,12 @@ namespace HueSharp.Messages.Lights
         [JsonProperty(PropertyName = "xy_inc")]
         public double[] CoordinatesIncrement
         {
-            get { return _incCoordinates; }
+            get => _incCoordinates;
             set
             {
-                if (value.Length != 2) throw new ArgumentOutOfRangeException($"The set of coordinates to change the current CIE color coordinates must be a size of 2.");
-                if (value[0] < -0.5 || value[0] > 0.5) throw new ArgumentOutOfRangeException($"CIE X coordinate increment must not be less than -0.5 or greater than 0.5.");
-                if (value[1] < -0.5 || value[1] > 0.5) throw new ArgumentOutOfRangeException($"CIE Y coordinate increment must not be less than -0.5 or greater than 0.5.");
+                if (value.Length != 2) throw new ArgumentOutOfRangeException(nameof(value), "The set of coordinates to change the current CIE color coordinates must be a size of 2.");
+                if (value[0] < -0.5 || value[0] > 0.5) throw new ArgumentOutOfRangeException(nameof(value), "CIE X coordinate increment must not be less than -0.5 or greater than 0.5.");
+                if (value[1] < -0.5 || value[1] > 0.5) throw new ArgumentOutOfRangeException(nameof(value), "CIE Y coordinate increment must not be less than -0.5 or greater than 0.5.");
                 SetValue(ref _incCoordinates, value);
             }
         }

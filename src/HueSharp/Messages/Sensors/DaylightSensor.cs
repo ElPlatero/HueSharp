@@ -8,7 +8,10 @@ namespace HueSharp.Messages.Sensors
 {
     public class DaylightSensor : SensorBase
     {
-        public DaylightSensor() : base() { Type = "Daylight"; }
+        public DaylightSensor()
+        {
+            Type = "Daylight";
+        }
         public DaylightSensor(JObject jObject) : base(jObject)
         {
             if (jObject != null)
@@ -32,7 +35,7 @@ namespace HueSharp.Messages.Sensors
             get
             {
                 if (_sensorPosition.IsUnknown) return "none";
-                return string.Format("{0}{1}", Math.Abs(_sensorPosition.Longitude).ToString("000.0000", CultureInfo.InvariantCulture), _sensorPosition.Longitude < 0 ? "W" : "E");
+                return $"{Math.Abs(_sensorPosition.Longitude).ToString("000.0000", CultureInfo.InvariantCulture)}{(_sensorPosition.Longitude < 0 ? "W" : "E")}";
             }
             set
             {
@@ -48,7 +51,7 @@ namespace HueSharp.Messages.Sensors
             get
             {
                 if (_sensorPosition.IsUnknown) return "none";
-                return string.Format("{0}{1}", Math.Abs(_sensorPosition.Latitude).ToString("000.0000", CultureInfo.InvariantCulture), _sensorPosition.Longitude < 0 ? "S" : "N");
+                return $"{Math.Abs(_sensorPosition.Latitude).ToString("000.0000", CultureInfo.InvariantCulture)}{(_sensorPosition.Longitude < 0 ? "S" : "N")}";
             }
             set
             {
@@ -65,33 +68,21 @@ namespace HueSharp.Messages.Sensors
         [JsonProperty(PropertyName = "sunriseoffset")]
         private int SunriseOffsetMinutes
         {
-            get
-            {
-                return Convert.ToInt32(SunriseOffset.TotalMinutes);
-            }
-            set
-            {
-                SunriseOffset = TimeSpan.FromMinutes(value);
-            }
+            get => Convert.ToInt32(SunriseOffset.TotalMinutes);
+            set => SunriseOffset = TimeSpan.FromMinutes(value);
         }
 
         [JsonProperty(PropertyName = "sunsetoffset")]
         private int SunsetOffsetMinutes
         {
-            get
-            {
-                return Convert.ToInt32(SunsetOffset.TotalMinutes);
-            }
-            set
-            {
-                SunsetOffset = TimeSpan.FromMinutes(value);
-            }
+            get => Convert.ToInt32(SunsetOffset.TotalMinutes);
+            set => SunsetOffset = TimeSpan.FromMinutes(value);
         }
         [JsonIgnore]
         public GeoCoordinate Position
         {
-            get { return _sensorPosition; }
-            set { _sensorPosition = value; }
+            get => _sensorPosition;
+            set => _sensorPosition = value;
         }
     }
     public class DaylightSensorState

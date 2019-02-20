@@ -1,11 +1,6 @@
 ﻿using HueSharp.Enums;
 using HueSharp.Messages;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HueSharp
 {
@@ -17,11 +12,6 @@ namespace HueSharp
         public ConditionExpressionVisitor(IHueRequest request)
         {
             _request = request;
-        }
-
-        public override Expression Visit(Expression node)
-        {
-            return base.Visit(node);
         }
 
         protected override Expression VisitParameter(ParameterExpression node)

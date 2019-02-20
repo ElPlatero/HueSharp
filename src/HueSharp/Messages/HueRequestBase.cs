@@ -22,8 +22,8 @@ namespace HueSharp.Messages
         [JsonIgnore]
         public virtual HttpMethod Method
         {
-            get { return _method; }
-            protected set { _method = value; }
+            get => _method;
+            protected set => _method = value;
         }
 
         public event EventHandler<string> Log;
@@ -41,7 +41,7 @@ namespace HueSharp.Messages
 
         protected void OnLog(object sender, string message)
         {
-            Log?.Invoke(this, message);
+            Log?.Invoke(sender, message);
         }
         protected void OnLog(string formatString, params object[] parameters)
         {

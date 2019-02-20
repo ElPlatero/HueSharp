@@ -13,7 +13,7 @@ namespace HueSharp.Builder
     class ModifyGroupBuilder : IModifyGroupBuilder
     {
         private readonly int _groupId;
-        private IModifyGroupAttributeEntryBuilder _attributeEntryBuilder;
+        private readonly IModifyGroupAttributeEntryBuilder _attributeEntryBuilder;
 
         public ModifyGroupBuilder(int groupId)
         {

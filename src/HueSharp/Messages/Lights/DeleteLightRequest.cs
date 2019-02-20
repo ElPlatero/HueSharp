@@ -8,7 +8,7 @@ namespace HueSharp.Messages.Lights
     public class DeleteLightRequest : HueRequestBase
     {
         public int LightId { get; set; }
-        private bool _isInitialized = false;
+        private bool _isInitialized;
 
         public DeleteLightRequest(int lightId) : base("lights", HttpMethod.Delete) { LightId = lightId; }
         public DeleteLightRequest() : this(-1) { }

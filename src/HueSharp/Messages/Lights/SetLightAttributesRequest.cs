@@ -22,8 +22,15 @@ namespace HueSharp.Messages.Lights
         {
             var successMessage = JsonConvert.DeserializeObject<SuccessResponse>(json, new SuccessResponseConverter(Address));
             if (successMessage.Any(p => p.Key == "name" && p.Value.ToString().Equals(NewName))) return successMessage;
-            var error = new ErrorResponse();
-            error.Add(new ErrorMessage { Address = Address, Description = "No error returned, but desired name isn't set either.", Type = ErrorCode.InternalError });
+            var error = new ErrorResponse
+            {
+                new ErrorMessage
+                {
+                    Address = Address,
+                    Description = "No error returned, but desired name isn't set either.",
+                    Type = ErrorCode.InternalError
+                }
+            };
             return error;
         }
 
