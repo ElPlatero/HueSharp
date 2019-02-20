@@ -4,7 +4,7 @@ using System.Net.Http;
 
 namespace HueSharp.Messages.Scenes
 {
-    public class CreateSceneRequest : HueRequestBase, IUploadable
+    class CreateSceneRequest : HueRequestBase, IUploadable
     {
         public CreateSceneParameters Parameters { get; set; }
 

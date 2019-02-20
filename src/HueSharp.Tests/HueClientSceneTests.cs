@@ -5,6 +5,7 @@ using HueSharp.Messages.Scenes;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using HueSharp.Builder;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -23,7 +24,7 @@ namespace HueSharp.Tests
         [ExplicitFact]
         public async Task GetAllScenesTest()
         {
-            IHueRequest request = new GetAllScenesRequest();
+            IHueRequest request = HueRequestBuilder.Select.Scenes.Build();
 
             var response = await _client.GetResponseAsync(request);
             Assert.True(response is GetAllScenesResponse, "response is of correct type");
@@ -33,7 +34,7 @@ namespace HueSharp.Tests
         [ExplicitFact]
         public async Task GetSceneTest()
         {
-            IHueRequest request = new GetSceneRequest(_sceneId);
+            IHueRequest request = HueRequestBuilder.Select.Scene(_sceneId).Build();
 
             var response = await _client.GetResponseAsync(request);
             Assert.True(response is GetSceneResponse, "response is of correct type");

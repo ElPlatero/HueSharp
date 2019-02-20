@@ -4,7 +4,7 @@ using System.Net.Http;
 
 namespace HueSharp.Messages.Scenes
 {
-    public class DeleteSceneRequest : HueRequestBase
+    class DeleteSceneRequest : HueRequestBase
     {
         public string SceneId { get; set; }
 

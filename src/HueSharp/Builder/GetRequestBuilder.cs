@@ -6,5 +6,7 @@
         public IBuilder Light(int lightId) => new GetLightStateRequestBuilder(lightId);
         public IBuilder Groups => new GetAllGroupsRequestBuilder();
         public IBuilder Group(int groupId) => new GetGroupStateRequestBuilder(groupId);
+        public IBuilder Scenes => new GetAllScenesRequestBuilder();
+        public IBuilder Scene(string sceneId) => new GetSceneRequestBuilder(sceneId);
     }
 }

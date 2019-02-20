@@ -3,7 +3,7 @@ using System.Net.Http;
 
 namespace HueSharp.Messages.Scenes
 {
-    public class GetSceneRequest : HueRequestBase
+    class GetSceneRequest : HueRequestBase
     {
         public string SceneId { get; set; }
 
