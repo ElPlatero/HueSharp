@@ -49,7 +49,22 @@ namespace HueSharp.Tests
         [ExplicitFact]
         public async Task CreateSceneTest()
         {
-            var request = new CreateSceneRequest
+            var request = HueRequestBuilder.Create.Scene.New("tmp scene").For.Group(1).Recycle.On.During(200);
+                request = HueRequestBuilder.Create.Scene.New("tmp scene").For.Light(1).AsIs().And(2).AsIs().And(3).AsIs().Recycle.Off.During(500);
+                request = HueRequestBuilder.Create.Scene.New("tmp scene")
+                    .For.Light(1)
+                        .TurnOn()
+                        .Brightness(100)
+                        .CieLocation(1, 2)
+                    .And(2)
+                        .TurnOff()
+                    .During(TimeSpan.FromMilliseconds(1000))
+                    .Recycle.On
+                    .Application.Version("2").Data("data");
+            
+
+
+            new CreateSceneRequest
             {
                 Parameters = new CreateSceneParameters
                 {

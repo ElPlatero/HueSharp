@@ -67,32 +67,36 @@ namespace HueSharp.Builder
 
         public CreateSceneFromGroupBuilder Group(int groupId)
         {
-            return new CreateSceneFromGroupBuilder(groupId);
+            return new CreateSceneFromGroupBuilder(_name, groupId);
         }
 
         public CreateSceneFromLightsBuilder Light(int lightId)
         {
-            return new CreateSceneFromLightsBuilder(lightId);
+            return new CreateSceneFromLightsBuilder(_name, lightId);
         }
 
     }
 
     public class CreateSceneFromLightsBuilder
     {
+        private readonly string _name;
         private readonly int _lightId;
 
-        public CreateSceneFromLightsBuilder(int lightId)
+        public CreateSceneFromLightsBuilder(string name, int lightId)
         {
+            _name = name;
             _lightId = lightId;
         }
     }
 
     public class CreateSceneFromGroupBuilder
     {
+        private readonly string _name;
         private int _groupId;
 
-        public CreateSceneFromGroupBuilder(int groupId)
+        public CreateSceneFromGroupBuilder(string name, int groupId)
         {
+            _name = name;
             _groupId = groupId;
         }
     }
