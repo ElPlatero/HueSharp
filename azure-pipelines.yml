@@ -13,8 +13,8 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- script: dotnet restore .\src
-- script: dotnet build src\HueSharp.sln --configuration $(buildConfiguration)
+- script: dotnet restore src/HueSharp
+- script: dotnet build src/HueSharp.sln --configuration $(buildConfiguration)
   displayName: 'dotnet build $(buildConfiguration)'
-- script: dotnet test .\src\HueSharp.Tests
+- script: dotnet test src/HueSharp.Tests
   displayName: 'dotnet test'
